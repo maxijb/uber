@@ -1,0 +1,76 @@
+@import '../../_variables';
+
+.searchbox-option {
+	display: none;
+	background: @accent;
+	padding: @half-padding @padding;
+
+	&.selected {
+		display: block;
+	}
+
+	.searchbox-option-title {
+		display: block;
+		text-transform: uppercase;
+		color: white;
+		font-size: 2em;
+		font-weight: bold;
+
+		&:after {
+			content: '';
+		    border-color: transparent;
+		    border-width: 10px;
+		    border-top-width: 14px;
+		    border-top-color: white;
+		    border-bottom: 0;
+		    border-style: solid;
+		    float: right;
+		    margin-top: 15px;
+		}
+	}
+
+	.searchbox-option-search {
+		position: relative;
+
+		.searchbox-input {
+			display: block;
+		    width: 99%;
+		    border: 0;
+		    outline: 0;
+		    padding: 11px;
+		    box-sizing: border-box;
+		    margin: 2px 0;
+		    font-size: 0.8em;
+		}
+
+		.icon {
+			position: absolute;
+		    top: 7px;
+		    right: 13px;
+		    display: block;
+		}
+	}
+
+}
+
+
+#searchbox-buttons {
+		display: table;
+		width: 100%;
+		color: white;
+
+
+		.searchbox-button {
+			display: table-cell;
+			background: @primary;
+			text-align: center;
+			padding: 3px 0;
+			width: 50%;
+			font-weight: bold;
+			cursor: pointer;
+			
+			&:first-child {
+				border-right: 2px solid white;
+			}
+		}
+	}

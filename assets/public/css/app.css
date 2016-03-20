@@ -1,0 +1,285 @@
+/* header */
+/* Colors */
+
+#main-app {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* header */
+/* Colors */
+header {
+  background: #495678;
+  height: 45px;
+  color: white;
+  font-size: 1.2em;
+}
+header .header-buttons {
+  float: right;
+  font-size: 0.8em;
+  padding-right: 20px;
+  padding-top: 10px;
+}
+header .header-buttons > a {
+  margin-left: 15px;
+}
+header h1 {
+  padding: 7px 20px;
+  float: left;
+}
+header h1 span {
+  font-weight: normal;
+  margin-left: 5px;
+}
+
+/* header */
+/* Colors */
+#map {
+  position: absolute;
+  left: 30%;
+  right: 0;
+  top: 45px;
+  bottom: 0;
+  background: #666;
+}
+@media (max-width: 833px) {
+  #map {
+    left: 250px;
+  }
+}
+
+#sidebar {
+  width: 30%;
+  float: left;
+  background: #ccc;
+  top: 45px;
+  bottom: 0;
+  position: absolute;
+  min-width: 250px;
+}
+
+.list-item {
+  clear: both;
+  padding: 5px 20px;
+  background: white;
+  overflow: hidden;
+  margin: 2px 0px;
+}
+.list-item:odd {
+  background: #eee;
+}
+.list-item img {
+  float: left;
+  height: 40px;
+  width: 30px;
+}
+
+/* header */
+/* Colors */
+.searchbox-option {
+  display: none;
+  background: #E67817;
+  padding: 10px 20px;
+}
+.searchbox-option.selected {
+  display: block;
+}
+.searchbox-option .searchbox-option-title {
+  display: block;
+  text-transform: uppercase;
+  color: white;
+  font-size: 2em;
+  font-weight: bold;
+}
+.searchbox-option .searchbox-option-title:after {
+  content: '';
+  border-color: transparent;
+  border-width: 10px;
+  border-top-width: 14px;
+  border-top-color: white;
+  border-bottom: 0;
+  border-style: solid;
+  float: right;
+  margin-top: 15px;
+}
+.searchbox-option .searchbox-option-search {
+  position: relative;
+}
+.searchbox-option .searchbox-option-search .searchbox-input {
+  display: block;
+  width: 99%;
+  border: 0;
+  outline: 0;
+  padding: 11px;
+  box-sizing: border-box;
+  margin: 2px 0;
+  font-size: 0.8em;
+}
+.searchbox-option .searchbox-option-search .icon {
+  position: absolute;
+  top: 7px;
+  right: 13px;
+  display: block;
+}
+#searchbox-buttons {
+  display: table;
+  width: 100%;
+  color: white;
+}
+#searchbox-buttons .searchbox-button {
+  display: table-cell;
+  background: #495678;
+  text-align: center;
+  padding: 3px 0;
+  width: 50%;
+  font-weight: bold;
+  cursor: pointer;
+}
+#searchbox-buttons .searchbox-button:first-child {
+  border-right: 2px solid white;
+}
+
+#sidebar-list {
+  overflow-y: scroll;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  top: 139px;
+}
+
+@import '../../node_modules/leaflet/dist/leaflet.css';
+.maximaxi {
+  display: block;
+}
+
+/**
+ * Global Reset of all HTML Elements
+ *
+ * Resetting all of our HTML Elements ensures a smoother
+ * visual transition between browsers. If you don't believe me,
+ * try temporarily commenting out this block of code, then go
+ * and look at Mozilla versus Safari, both good browsers with
+ * a good implementation of CSS. The thing is, all browser CSS
+ * defaults are different and at the end of the day if visual
+ * consistency is what we're shooting for, then we need to
+ * make sure we're resetting all spacing elements.
+ *
+ */
+html,
+body {
+  border: 0;
+  font-family: 'Roboto', "Helvetica-Neue", "Helvetica", Arial, sans-serif;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+}
+div,
+span,
+object,
+iframe,
+img,
+table,
+caption,
+thead,
+tbody,
+tfoot,
+tr,
+tr,
+td,
+article,
+aside,
+canvas,
+details,
+figure,
+hgroup,
+menu,
+nav,
+footer,
+header,
+section,
+summary,
+mark,
+audio,
+video {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+address,
+cit,
+code,
+del,
+dfn,
+em,
+ins,
+q,
+samp,
+small,
+strong,
+sub,
+sup,
+b,
+i,
+hr,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+legend,
+label {
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  margin: 0;
+  padding: 0;
+}
+article,
+aside,
+canvas,
+figure,
+figure img,
+figcaption,
+hgroup,
+footer,
+header,
+nav,
+section,
+audio,
+video {
+  display: block;
+}
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+table caption,
+table th,
+table td {
+  text-align: left;
+  vertical-align: middle;
+}
+a img {
+  border: 0;
+}
+:focus {
+  outline: 0;
+}

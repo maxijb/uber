@@ -1,0 +1,28 @@
+@import '../_variables';
+
+header {
+	background: @primary; 
+	height: @header-height;
+	color: white;
+	font-size: 1.2em;
+
+	.header-buttons {
+		float: right; 
+		font-size: 0.8em;
+		padding-right: @padding;
+		padding-top: 10px;
+
+		> a {
+			margin-left: 15px; 
+		}
+	}
+
+	h1 {
+		padding: 7px @padding;
+		float: left;
+		span {
+			font-weight: normal;
+			margin-left: 5px;
+		}
+	}
+}

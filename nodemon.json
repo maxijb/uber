@@ -1,0 +1,6 @@
+{
+  "watch": ["app", "assets/js/components"],
+   "verbose": false,
+   "ignore" : [],
+   "ext": "js coffee json jade jsx"
+}
