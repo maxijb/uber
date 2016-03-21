@@ -14,13 +14,13 @@ export default React.createClass({
   							 {"selected": !!this.props.selected});
 
     return (
-    	<li className={itemClass}>
-			<span className="searchbox-option-title">{this.props.type}</span>
-			<div className="searchbox-option-search">
-				<input type="text" className="searchbox-input" placeholder="Search..."/>
-				<span className="icon icon-search">MAx</span>
-			</div>
-		</li>
+    	<li className={itemClass} onClick={this.props.handleClick}>
+  			<span className="searchbox-option-title">{this.props.type}</span>
+  			<div className="searchbox-option-search">
+  				<input type="text" className="searchbox-input" placeholder="Search..."/>
+  				<span className="icon icon-search">MAx</span>
+  			</div>
+  		</li>
     );
   }
 

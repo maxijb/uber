@@ -43,6 +43,26 @@ function startServer(dataset) {
 	  res.send(dataset.getInstance().districts);
 	})	
 
+
+	app.get('/api/actors', function(req, res){
+	  res.send(dataset.getInstance().persons.filter(person => {
+	  	return person && person.name && person.type.some(type => type == 'actor');
+	  }));
+	})	
+
+
+	app.get('/api/directors', function(req, res){
+	  res.send(dataset.getInstance().persons.filter(person => {
+	  	return person && person.name && person.type.some(type => type == 'director');
+	  }));
+	})	
+
+	app.get('/api/writers', function(req, res){
+	  res.send(dataset.getInstance().persons.filter(person => {
+	  	return person && person.name && person.type.some(type => type == 'writer');
+	  }));
+	})	
+
 	app.listen(3000, function() {
 	  console.log('Listening on port 3000...')
 	})

@@ -1,4 +1,7 @@
 import {default as React} from 'react';
+import {events} from '../constants/Constants';
+import {default as MapActions} from '../actions/MapActions.js';
+import {default as MapStore} from '../stores/MapStore.js';
 import {mapboxApiKey, googleResponseDefaultSF as googleSF} from '../constants/Constants';
 let L;
 if (typeof window !== "undefined") {
@@ -10,30 +13,46 @@ if (typeof window !== "undefined") {
 export default React.createClass({
   
   componentDidMount() {
-  	  this.map = L.map('map');
+  	  
+      pubsub.on(events.mapStateChange, this.handleMapStateChange);
+
+      this.map = L.map('map');
   	  L.Icon.Default.imagePath = '/static/images/';
   	  L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + mapboxApiKey)
   	  .addTo(this.map);
 
 	  this.map.setView([googleSF.lat, googleSF.lng], googleSF.zoom); 
 
-	  this.markers = {};
+	  this.markers = [];
   },
 
+  getInitialState() {
+    return {
+      mapLocations: []
+    }
+  },
+
+
+  handleMapStateChange(mapState) {
+    if (mapState.mapLocations !== this.state.mapLocations) {
+      this.setState({mapLocations : mapState.mapLocations})
+      this.updateMarkers();
+    }
+  },
 
   shouldComponentUpdate: function(nextProps, nextState) {
-  	return nextProps.mapLocations !== this.props.mapLocations;
+    //the rendering of the map ois performed by leaflet, not React
+  	return false;
   },
 
-  componentWillUpdate(nextProps, nextState) {
-  	nextProps.mapLocations.forEach(loc => {
-  		console.log('point', loc);
+
+  updateMarkers() {
+  	this.state.mapLocations.forEach(loc => {
   		//if valid point
   		if (loc && loc.lat) {
-  			L.marker([loc.lat, loc.lng]).addTo(this.map)
+  			L.marker([loc.lat, loc.lng]).addTo(this.map);
   		}
   	});
-
   },
 
   render: function() {

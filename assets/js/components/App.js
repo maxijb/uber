@@ -41,7 +41,7 @@ let App = React.createClass({
     	<div id="main-app">
     		<Header/>
     		<div id="main-container">
-    			<Sidebar listItems={this.state.movies} />
+    			<Sidebar />
     			<Map districts={this.state.districts} mapLocations={this.state.mapLocations} />
     			<DetailsBar />
     		</div>

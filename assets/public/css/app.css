@@ -140,6 +140,40 @@ header h1 span {
 #searchbox-buttons .searchbox-button:first-child {
   border-right: 2px solid white;
 }
+.searchbox-options.open {
+  overflow: visible;
+  position: relative;
+  z-index: 1;
+  padding-top: 58px;
+}
+.searchbox-options.open .searchbox-option {
+  display: block;
+}
+.searchbox-options.open .searchbox-option .searchbox-option-title {
+  font-size: 1em;
+}
+.searchbox-options.open .searchbox-option .searchbox-option-title:after {
+  display: none;
+}
+.searchbox-options.open .searchbox-option.selected {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  padding-bottom: 0;
+}
+.searchbox-options.open .searchbox-option.selected .searchbox-option-title {
+  font-size: 2em;
+}
+.searchbox-options.open .searchbox-option.selected .searchbox-option-title:after {
+  display: block;
+  border-bottom-width: 14px;
+  border-bottom-color: white;
+  border-top: 0;
+}
+.searchbox-options.open .searchbox-option .searchbox-option-search {
+  display: none;
+}
 
 #sidebar-list {
   overflow-y: scroll;

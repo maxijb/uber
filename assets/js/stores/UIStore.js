@@ -10,23 +10,7 @@ const UIStore = (() => {
 
 
 
-	pubsub.on(events.moviesLoaded, (movies) => {
-		console.log(movies);
-		_state.movies = movies;
-		emitChange();
-	});
-
-	pubsub.on(events.locationsLoaded, (locations) => {
-		_state.mapLocations = locations;
-		emitChange();
-	});
-
-
-	pubsub.on(events.districtsLoaded, (districts) => {
-		_state.districts = districts;
-		_state.mapLocations = districts;
-		emitChange();
-	});
+	
 
 
 	return {

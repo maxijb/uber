@@ -8,18 +8,30 @@ export const googleResponseDefaultSF = {
 	};
 
 export const actions = {
-	appLoad: 'appLoad'
+	appLoad: 'appLoad',
+	changeItemsType: 'changeItemsType'
 }
 
 export const events = {
 	stateChanged: 'stateChanged',
 	moviesLoaded: 'moviesLoaded',
 	locationsLoaded: 'locationsLoaded',
-	districtsLoaded: 'districtsLoaded'
+	districtsLoaded: 'districtsLoaded',
+
+	setSidebarItems: 'setSidebarItems',
+	addSidebarItems: 'addSidebarItems',
+
+	sidebarStateChange: 'sidebarStateChange',
+	sidebarItemsWillBeSet: 'sidebarItemsWillBeSet',
+
+	mapStateChange: 'mapStateChange'
 }
 
 export const urls = {
 	locations	: '/api/locations',
 	movies		: '/api/movies',
-	districts	: '/api/districts'
+	districts	: '/api/districts',
+	actors		: '/api/actors',
+	directors	: '/api/directors',
+	writers		: '/api/writers',
 }

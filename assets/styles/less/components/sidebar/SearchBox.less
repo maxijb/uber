@@ -1,5 +1,6 @@
 @import '../../_variables';
 
+
 .searchbox-option {
 	display: none;
 	background: @accent;
@@ -74,3 +75,51 @@
 			}
 		}
 	}
+
+
+.searchbox-options {
+
+	&.open {
+		overflow: visible;
+	    position: relative;
+	    z-index: 1;
+	    padding-top: 58px;
+
+		.searchbox-option {
+			display: block;
+			
+			.searchbox-option-title {
+				font-size: 1em;
+
+				&:after {
+					display: none;
+				}
+			}	
+
+			&.selected {
+				position: absolute;
+				top: 0;
+				right: 0;
+    			left: 0;
+    			padding-bottom: 0;
+				.searchbox-option-title {
+					font-size: 2em;
+
+					&:after {
+						display: block;
+						border-bottom-width: 14px;
+					    border-bottom-color: white;
+					    border-top: 0;
+					}
+				}
+			}
+				
+
+
+			.searchbox-option-search {
+				display: none;
+			}
+		}
+	}
+
+}

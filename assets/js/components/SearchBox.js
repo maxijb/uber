@@ -4,20 +4,32 @@ import {default as SearchBoxOption} from './SearchBoxOption';
 export default React.createClass({
 
   
-  getDefaultProps() {
+  getInitialState() {
     return {
-      typesOfSearch: ["movies", "districs", "locations", "actors", "directors", "writers"],
-      typeSelected: "movies"
-    };
+      open: false,
+      typesOfSearch: ["movies", "districts", "locations", "actors", "directors", "writers"]
+    }
   },
 
+  toggleOpen(e) {
+    if (e.target.tagName !== "INPUT") {
+      var isOpen = this.state.open;
+      this.setState({open: !isOpen});
+    }
+  },
+
+  handleOptionClick(type) {
+    if (this.state.open) {
+      this.props.changeType(type);
+    }
+  },
 
   render() {
     return (
     	<div id="searchbox">
-    		<ul className="searchbox-options">
-    			{this.props.typesOfSearch.map((type, i) => ( 
-    				<SearchBoxOption key={i} type={type} selected={type==this.props.typeSelected} /> 
+    		<ul className={"searchbox-options " + (this.state.open ? "open" : "")} onClick={this.toggleOpen}>
+    			{this.state.typesOfSearch.map((type, i) => ( 
+    				<SearchBoxOption key={i} type={type} selected={type==this.props.type} handleClick={this.handleOptionClick.bind(this, type)} /> 
     			  )
     			)}
     		</ul>
