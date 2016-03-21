@@ -14,10 +14,12 @@ export const actions = {
 export const events = {
 	stateChanged: 'stateChanged',
 	moviesLoaded: 'moviesLoaded',
-	locationsLoaded: 'locationsLoaded'
+	locationsLoaded: 'locationsLoaded',
+	districtsLoaded: 'districtsLoaded'
 }
 
 export const urls = {
 	locations	: '/api/locations',
-	movies		: '/api/movies'
+	movies		: '/api/movies',
+	districts	: '/api/districts'
 }

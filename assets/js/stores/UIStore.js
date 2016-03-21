@@ -6,17 +6,26 @@ const UIStore = (() => {
 	let _state = {};
 
 	//Let the views know that the state is changed
-	let emitChange = (key) => { pubsub.emit(events.stateChange, key); }
+	let emitChange = () => { pubsub.emit(events.stateChange); }
 
 
-	pubsub.on(events.locationsLoaded, (locations) => {
-		_state.locations = locations;
-		emitChange('locations');
-	});
 
 	pubsub.on(events.moviesLoaded, (movies) => {
+		console.log(movies);
 		_state.movies = movies;
-		emitChange('movies');
+		emitChange();
+	});
+
+	pubsub.on(events.locationsLoaded, (locations) => {
+		_state.mapLocations = locations;
+		emitChange();
+	});
+
+
+	pubsub.on(events.districtsLoaded, (districts) => {
+		_state.districts = districts;
+		_state.mapLocations = districts;
+		emitChange();
 	});
 
 

@@ -39,10 +39,8 @@ function startServer(dataset) {
 		res.send(dataset.getInstance().movies);
 	});
 
-	app.get('/dataset', function(req, res){
-	  res.send(dataset.getInstance());//, {
-	  //   react: ReactDOM.renderToString(HelloMessage({name: "John"}))
-	  // })
+	app.get('/api/districts', function(req, res){
+	  res.send(dataset.getInstance().districts);
 	})	
 
 	app.listen(3000, function() {

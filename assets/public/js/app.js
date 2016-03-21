@@ -21,8 +21,16 @@ var UIActions = {
 
   appLoad: function appLoad() {
     _Dispatcher2.default.emit(_Constants.actions.appLoad);
-    this.requestLocations();
+    this.requestDistricts();
     this.requestMovies();
+  },
+  requestDistricts: function requestDistricts(filter) {
+
+    fetch(_Constants.urls.districts).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      _Dispatcher2.default.emit(_Constants.events.districtsLoaded, data);
+    });
   },
   requestLocations: function requestLocations(filter) {
 
@@ -90,27 +98,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var App = _react2.default.createClass({
   displayName: 'App',
   componentDidMount: function componentDidMount() {
-    var _this = this;
-
     //emit that the app has been loaded
     _UIActions2.default.appLoad();
 
     //subscribe to the UIState change and set state accordingly
-    pubsub.on(_Constants.events.changeState, function (key) {
-      var newState = {};
-      if (key) {
-        newState[key] = _UIStore2.default.getState()[key];
-      } else {
-        newState = _UIStore2.default.getState();
-      }
-      _this.setState(newState);
-    });
+    pubsub.on(_Constants.events.changeState, this.handleChange);
   },
   getInitialState: function getInitialState() {
     return {
-      locations: {},
-      movies: {}
+      districts: [],
+      mapLocations: [],
+      movies: []
     };
+  },
+  handleChange: function handleChange() {
+    this.setState(_UIStore2.default.getState());
   },
   render: function render() {
     return _react2.default.createElement(
@@ -121,7 +123,7 @@ var App = _react2.default.createClass({
         'div',
         { id: 'main-container' },
         _react2.default.createElement(_Sidebar2.default, { listItems: this.state.movies }),
-        _react2.default.createElement(_Map2.default, { locations: this.state.locations }),
+        _react2.default.createElement(_Map2.default, { districts: this.state.districts, mapLocations: this.state.mapLocations }),
         _react2.default.createElement(_DetailsBar2.default, null)
       )
     );
@@ -301,16 +303,19 @@ exports.default = _react2.default.createClass({
 
 
   shouldComponentUpdate: function shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.locations !== this.props.locations;
+    return nextProps.mapLocations !== this.props.mapLocations;
   },
 
   componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
-    for (var i in nextProps.locations) {
-      var location = nextProps.locations[i];
-      if (location && location.lat) {
-        L.marker([nextProps.locations[i].lat, nextProps.locations[i].lng]).addTo(this.map);
+    var _this = this;
+
+    nextProps.mapLocations.forEach(function (loc) {
+      console.log('point', loc);
+      //if valid point
+      if (loc && loc.lat) {
+        L.marker([loc.lat, loc.lng]).addTo(_this.map);
       }
-    }
+    });
   },
 
 
@@ -476,13 +481,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = _react2.default.createClass({
   displayName: 'SidebarList',
+  getDefaultProps: function getDefaultProps() {
+    return {
+      listItems: []
+    };
+  },
 
 
   render: function render() {
-    var _this = this;
 
-    var items = Object.keys(this.props.listItems).map(function (id) {
-      return _react2.default.createElement(_ListItem2.default, { key: id, item: _this.props.listItems[id] });
+    var items = this.props.listItems.map(function (item) {
+      if (item) return _react2.default.createElement(_ListItem2.default, { key: item.id, item: item });
     });
 
     return _react2.default.createElement(
@@ -541,12 +550,14 @@ var actions = exports.actions = {
 var events = exports.events = {
 	stateChanged: 'stateChanged',
 	moviesLoaded: 'moviesLoaded',
-	locationsLoaded: 'locationsLoaded'
+	locationsLoaded: 'locationsLoaded',
+	districtsLoaded: 'districtsLoaded'
 };
 
 var urls = exports.urls = {
 	locations: '/api/locations',
-	movies: '/api/movies'
+	movies: '/api/movies',
+	districts: '/api/districts'
 };
 
 },{}],13:[function(require,module,exports){
@@ -588,18 +599,25 @@ var UIStore = function () {
 	var _state = {};
 
 	//Let the views know that the state is changed
-	var emitChange = function emitChange(key) {
-		_Dispatcher2.default.emit(_Constants.events.stateChange, key);
+	var emitChange = function emitChange() {
+		_Dispatcher2.default.emit(_Constants.events.stateChange);
 	};
 
-	_Dispatcher2.default.on(_Constants.events.locationsLoaded, function (locations) {
-		_state.locations = locations;
-		emitChange('locations');
+	_Dispatcher2.default.on(_Constants.events.moviesLoaded, function (movies) {
+		console.log(movies);
+		_state.movies = movies;
+		emitChange();
 	});
 
-	_Dispatcher2.default.on(_Constants.events.moviesLoaded, function (movies) {
-		_state.movies = movies;
-		emitChange('movies');
+	_Dispatcher2.default.on(_Constants.events.locationsLoaded, function (locations) {
+		_state.mapLocations = locations;
+		emitChange();
+	});
+
+	_Dispatcher2.default.on(_Constants.events.districtsLoaded, function (districts) {
+		_state.districts = districts;
+		_state.mapLocations = districts;
+		emitChange();
 	});
 
 	return {

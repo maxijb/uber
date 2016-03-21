@@ -8,10 +8,22 @@ var UIActions = {
    */
   appLoad() {
     pubsub.emit(actions.appLoad);
-    this.requestLocations();
+    this.requestDistricts();
     this.requestMovies();
   },
 
+
+  requestDistricts(filter) {
+
+    fetch(urls.districts)
+    .then((response) => {
+     return response.json()
+    })
+    .then(data => {
+      pubsub.emit(events.districtsLoaded, data);
+    });
+
+  },
 
   requestLocations(filter) {
 

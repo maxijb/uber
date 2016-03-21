@@ -3,10 +3,18 @@ import {default as ListItem} from './ListItem';
 
 export default React.createClass({
 
+
+  getDefaultProps() {
+    return {
+      listItems: []
+    }
+  },
+
   render: function() {
-  	let items = Object.keys(this.props.listItems).map(id => {
-  		return ( <ListItem key={id} item={this.props.listItems[id]}/> )
-  	})
+
+  	let items = this.props.listItems.map(item => {
+  		if (item) return ( <ListItem key={item.id} item={item}/> )
+  	});
 
     return (
     	<div id="sidebar-list">

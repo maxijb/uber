@@ -35,16 +35,16 @@ const googleLevels = {
 const normalizedData = {
 
 	movies: {},
-	moviesIndex: 0,
+	moviesIndex: -1,
 	
 	locations: {},
-	locationsIndex: 0,
+	locationsIndex: -1,
 
 	persons: {},
-	personsIndex: 0,
+	personsIndex: -1,
 
 	districts: {},
-	districtsIndex: 0
+	districtsIndex: -1
 
 }
 
@@ -64,14 +64,14 @@ new Promise((resolve, reject) => {
 	.then(mapLocations)
 	//work with normalized data
 	.then(() => normalizedData)
-	.then(getLocationData)
 	.then(getMoviesData)
+	.then(getLocationData)
 	//prepare output and save to file
 	.then(formatOutput)
 	.then(data => {
 		//persist to file
 		return new Promise((resolve, reject) => {
-			fs.writeFile('data.json', JSON.stringify(data), function(err) {
+			fs.writeFile('../data/data-preprocessed.json', JSON.stringify(data), function(err) {
 				!err ? resolve(data) : reject(err);
 			});
 		});
@@ -210,6 +210,8 @@ function mapLocations(data) {
  */
 function getMoviesData(data) {
 	
+	log10(data.locations);
+
 	console.log("STARTING MOVIES DATA...")
 
 	//Get every movie name
@@ -414,9 +416,8 @@ function formatOutput(data) {
 		return Object.keys(obj).reduce((prev, key) => {
 			let id = obj[key].id;
 			prev[id] = obj[key];
-			delete prev[id].id;
 			return prev;
-		}, {})
+		}, [])
 	}
 }
 

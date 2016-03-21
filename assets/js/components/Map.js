@@ -22,16 +22,17 @@ export default React.createClass({
 
 
   shouldComponentUpdate: function(nextProps, nextState) {
-  	return nextProps.locations !== this.props.locations;
+  	return nextProps.mapLocations !== this.props.mapLocations;
   },
 
   componentWillUpdate(nextProps, nextState) {
-  	for (let i in nextProps.locations) {
-  		let location = nextProps.locations[i];
-  		if (location && location.lat) {
-  			L.marker([nextProps.locations[i].lat, nextProps.locations[i].lng]).addTo(this.map)
+  	nextProps.mapLocations.forEach(loc => {
+  		console.log('point', loc);
+  		//if valid point
+  		if (loc && loc.lat) {
+  			L.marker([loc.lat, loc.lng]).addTo(this.map)
   		}
-  	}
+  	});
 
   },
 

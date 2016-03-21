@@ -19,24 +19,21 @@ let App = React.createClass({
     Actions.appLoad();
 
     //subscribe to the UIState change and set state accordingly
-    pubsub.on(events.changeState, (key) => {
-      let newState = {};
-      if (key) {
-        newState[key] = UIStore.getState()[key];
-      } else {
-        newState = UIStore.getState();
-      }
-      this.setState(newState);
-    })
+    pubsub.on(events.changeState, this.handleChange);
 
   },  
 
 
   getInitialState() {
     return {
-      locations: {},
-      movies: {}
+      districts: [],
+      mapLocations: [],
+      movies: []
     }
+  },
+
+  handleChange() {
+    this.setState(UIStore.getState());
   },
 
   render() {
@@ -45,7 +42,7 @@ let App = React.createClass({
     		<Header/>
     		<div id="main-container">
     			<Sidebar listItems={this.state.movies} />
-    			<Map locations={this.state.locations} />
+    			<Map districts={this.state.districts} mapLocations={this.state.mapLocations} />
     			<DetailsBar />
     		</div>
     	</div>
