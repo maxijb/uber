@@ -12,15 +12,16 @@ const SidebarStore = (() => {
 
 
 
-	pubsub.on(events.locationsLoaded, (locations) => {
-		_state.mapLocations = locations;
+	pubsub.on(events.locationsLoaded, (response) => {
+		_state.mapLocations = response.items;
 		emitChange();
 	});
 
 
-	pubsub.on(events.districtsLoaded, (districts) => {
-		_state.districts = districts;
-		_state.mapLocations = districts;
+	pubsub.on(events.districtsLoaded, (response) => {
+		console.log(response);
+		_state.districts = response.items;
+		_state.mapLocations = response.items;
 		emitChange();
 	});
 	

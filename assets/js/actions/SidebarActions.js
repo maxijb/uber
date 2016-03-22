@@ -3,18 +3,18 @@ import {actions, events, urls} from '../constants/Constants';
 
 var SidebarActions = (function() {
 
-  pubsub.on(actions.appLoad, requestSidebarItems.bind(this, true, 'movies'));
+  pubsub.on(actions.appLoad, requestItems.bind(this, true, 'movies'));
   
 
   function changeType(type) {
      pubsub.emit(events.sidebarItemsWillBeSet);
-     requestSidebarItems(true, type);
+     requestItems(true, type);
   }
 
  
-  function requestSidebarItems(setNewItems, type, filter, sort) {
+  function requestItems(setNewItems, type, options) {
 
-    fetch(urls[type])
+    fetch(urls[type] + queryString(options))
     .then((response) => {
      return response.json()
     })
@@ -27,8 +27,18 @@ var SidebarActions = (function() {
   
 
   return {
-    requestSidebarItems,
+    requestItems,
     changeType
+  }
+
+
+  function queryString(obj) {
+    var str = [];
+    for(var p in obj)
+      if (obj.hasOwnProperty(p)) {
+        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+      }
+    return "?" + str.join("&");
   }
 
 

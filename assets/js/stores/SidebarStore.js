@@ -1,47 +1,52 @@
 import {default as pubsub} from '../dispatcher/Dispatcher';
 import {events} from '../constants/Constants';
+import {EventEmitter} from 'events';
 
-const SidebarStore = (() => {
+const SidebarStore = Object.assign({}, EventEmitter.prototype, (() => {
 
+	//Default state container
 	let _state = {
 		listItems: []
 	};
 
-	//Let the views know that the state is changed
-	let emitChange = () => { pubsub.emit(events.sidebarStateChange, _state); }
-
-
-
-	pubsub.on(events.addSidebarItems, (items) => {
-		_state.listItems = _state.listItems.concat(items);
-		_state.loading = false;
-		emitChange();
-	});
-
-	pubsub.on(events.setSidebarItems, (items) => {
-		_state.listItems = items;
-		_state.loading = false;
-		emitChange();
-	});	
-
-	pubsub.on(events.sidebarItemsWillBeSet, () => {
-		_state.listItems = [];
-		_state.loading = true;
-		emitChange();
-	});
-
-	pubsub.on(events.sidebarItemsWillBeAdded, () => {
-		_state.loading = true;
-		emitChange();
-	});
+	//Setting event Listeners, coming from actions
+	pubsub
+		.on(events.addSidebarItems, (response) => {
+			_state.complete = response.complete;
+			_state.listItems = _state.listItems.concat(response.items);
+			_state.loading = false;
+			SidebarStore.emitChange();
+		})
+		.on(events.setSidebarItems, (response) => {
+			_state.complete = response.complete;
+			_state.listItems = response.items;
+			_state.loading = false;
+			SidebarStore.emitChange();
+		})
+		.on(events.sidebarItemsWillBeSet, () => {
+			_state.listItems = [];
+			_state.loading = "full";
+			SidebarStore.emitChange();
+		})
+		.on(events.sidebarItemsWillBeAdded, () => {
+			_state.loading = "partial";
+			SidebarStore.emitChange();
+		});
 	
-
+	//Export public API
 	return {
-		getState() { return _state } 
+		//Getter to the state
+		getState() { return _state } ,
+
+		//Emit the change event for the views
+		emitChange() { 
+			this.emit(events.change, _state);
+		}
 	}
 
 
-})();
+})());
+
 
 
 export default SidebarStore;

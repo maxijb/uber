@@ -19,7 +19,7 @@ var MapActions = function () {
 
   function requestDistricts(filter) {
     console.log('llea');
-    fetch(_Constants.urls.districts).then(function (response) {
+    fetch(_Constants.urls.districts + "?limit=5000").then(function (response) {
       return response.json();
     }).then(function (data) {
       _Dispatcher2.default.emit(_Constants.events.districtsLoaded, data);
@@ -60,16 +60,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var SidebarActions = function () {
 
-  _Dispatcher2.default.on(_Constants.actions.appLoad, requestSidebarItems.bind(this, true, 'movies'));
+  _Dispatcher2.default.on(_Constants.actions.appLoad, requestItems.bind(this, true, 'movies'));
 
   function changeType(type) {
     _Dispatcher2.default.emit(_Constants.events.sidebarItemsWillBeSet);
-    requestSidebarItems(true, type);
+    requestItems(true, type);
   }
 
-  function requestSidebarItems(setNewItems, type, filter, sort) {
+  function requestItems(setNewItems, type, options) {
 
-    fetch(_Constants.urls[type]).then(function (response) {
+    fetch(_Constants.urls[type] + queryString(options)).then(function (response) {
       return response.json();
     }).then(function (data) {
       var event = setNewItems ? _Constants.events.setSidebarItems : _Constants.events.addSidebarItems;
@@ -78,9 +78,18 @@ var SidebarActions = function () {
   }
 
   return {
-    requestSidebarItems: requestSidebarItems,
+    requestItems: requestItems,
     changeType: changeType
   };
+
+  function queryString(obj) {
+    var str = [];
+    for (var p in obj) {
+      if (obj.hasOwnProperty(p)) {
+        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+      }
+    }return "?" + str.join("&");
+  }
 }();
 
 exports.default = SidebarActions;
@@ -454,7 +463,12 @@ exports.default = _react2.default.createClass({
         'ul',
         { className: "searchbox-options " + (this.state.open ? "open" : ""), onClick: this.toggleOpen },
         this.state.typesOfSearch.map(function (type, i) {
-          return _react2.default.createElement(_SearchBoxOption2.default, { key: i, type: type, selected: type == _this.props.type, handleClick: _this.handleOptionClick.bind(_this, type) });
+          return _react2.default.createElement(_SearchBoxOption2.default, { key: i,
+            type: type,
+            selected: type == _this.props.type,
+            handleClick: _this.handleOptionClick.bind(_this, type),
+            handleFilterChange: _this.props.handleFilterChange,
+            filterValue: _this.props.filterValue });
         })
       ),
       _react2.default.createElement(
@@ -494,6 +508,18 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = _react2.default.createClass({
   displayName: 'SearchBoxOption',
+  getInitialState: function getInitialState() {
+    return {
+      filterValue: ""
+    };
+  },
+  resetFilter: function resetFilter(event) {
+    event.stopPropagation();
+    this.props.handleFilterChange("");
+  },
+  handleFilterChange: function handleFilterChange(event) {
+    this.props.handleFilterChange(event.target.value);
+  },
   render: function render() {
 
     var itemClass = (0, _classnames2.default)("searchbox-option", this.props.type + "-option", { "selected": !!this.props.selected });
@@ -509,10 +535,15 @@ exports.default = _react2.default.createClass({
       _react2.default.createElement(
         'div',
         { className: 'searchbox-option-search' },
-        _react2.default.createElement('input', { type: 'text', className: 'searchbox-input', placeholder: 'Search...' }),
+        _react2.default.createElement('input', { type: 'text',
+          className: 'searchbox-input',
+          value: this.props.filterValue,
+          placeholder: 'Search...',
+          onChange: this.handleFilterChange
+        }),
         _react2.default.createElement(
           'span',
-          { className: 'icon icon-search' },
+          { className: 'icon icon-search', onClick: this.resetFilter },
           'MAx'
         )
       )
@@ -554,30 +585,56 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.default = _react2.default.createClass({
   displayName: 'Sidebar',
   componentDidMount: function componentDidMount() {
-    //subscribe to the UIState change and set state accordingly
-    pubsub.on(_Constants.events.sidebarStateChange, this.handleChangeItems);
+    _SidebarStore2.default.on(_Constants.events.change, this.handleStoreChange);
   },
   getInitialState: function getInitialState() {
     return {
       type: 'movies',
-      listItems: []
+      listItems: [],
+      filterValue: ''
     };
   },
-  handleChangeItems: function handleChangeItems(storeState) {
-    this.setState({ listItems: storeState.listItems });
+  handleStoreChange: function handleStoreChange(storeState) {
+    this.setState(storeState);
   },
   changeType: function changeType(type) {
-    this.setState({ "type": type });
+    this.setState({ "type": type, filterValue: '' });
     _SidebarActions2.default.changeType(type);
+  },
+  requestItems: function requestItems() {
+    _SidebarActions2.default.requestItems(false, this.state.type, {
+      offset: this.state.listItems.length
+    });
+  },
+  handleFilterChange: function handleFilterChange(value) {
+    console.log(value);
+    this.setState({ filterValue: value });
+    //TODO Debounce
+    _SidebarActions2.default.requestItems(true, this.state.type, {
+      name: value
+    });
   },
 
 
   render: function render() {
     return _react2.default.createElement(
       'div',
-      { id: 'sidebar' },
-      _react2.default.createElement(_SearchBox2.default, { type: this.state.type, changeType: this.changeType, changeSearch: this.changeSearch, changeFilter: this.changeFilter, changeSort: this.changeSort }),
-      _react2.default.createElement(_SidebarList2.default, { type: this.state.type, listItems: this.state.listItems })
+      { id: 'sidebar', className: this.state.loading ? "loading" + this.state.loading : "" },
+      _react2.default.createElement(_SearchBox2.default, {
+        type: this.state.type,
+        changeType: this.changeType,
+        handleFilterChange: this.handleFilterChange,
+        changeSearch: this.changeSearch,
+        changeSort: this.changeSort,
+        filterValue: this.state.filterValue
+      }),
+      _react2.default.createElement(_SidebarList2.default, {
+        type: this.state.type,
+        listItems: this.state.listItems,
+        complete: this.state.complete,
+        requestItems: this.requestItems,
+        loading: this.state.loading
+      })
     );
   }
 
@@ -602,10 +659,36 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = _react2.default.createClass({
   displayName: 'SidebarList',
+  componentDidMount: function componentDidMount() {
+    //we want to implement infinite scrolling
+    //TODO: debounce
+    this.node = this.getDOMNode();
+    this.node.addEventListener('scroll', this.handleScroll);
+  },
   getDefaultProps: function getDefaultProps() {
     return {
       listItems: []
     };
+  },
+
+
+  //remove listeners from the dom, when unmounting
+  componentWillUnmount: function componentWillUnmount() {
+    this.node.removeEventListener('scroll', this.handleScroll);
+  },
+
+
+  //only update if the list has changed, we use immutable arrays!
+  shouldComponentUpdate: function shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.listItems !== this.props.listItems;
+  },
+
+
+  //handle the scrolling event and request more items if we've scrolled beyond 80% of the bar
+  handleScroll: function handleScroll() {
+    if (!this.props.loading && !this.props.complete && this.node.scrollTop + this.node.offsetHeight > this.node.scrollHeight * 0.8) {
+      this.props.requestItems();
+    }
   },
 
 
@@ -681,7 +764,9 @@ var events = exports.events = {
 	sidebarStateChange: 'sidebarStateChange',
 	sidebarItemsWillBeSet: 'sidebarItemsWillBeSet',
 
-	mapStateChange: 'mapStateChange'
+	mapStateChange: 'mapStateChange',
+
+	change: 'change'
 };
 
 var urls = exports.urls = {
@@ -738,14 +823,15 @@ var SidebarStore = function () {
 		_Dispatcher2.default.emit(_Constants.events.mapStateChange, _state);
 	};
 
-	_Dispatcher2.default.on(_Constants.events.locationsLoaded, function (locations) {
-		_state.mapLocations = locations;
+	_Dispatcher2.default.on(_Constants.events.locationsLoaded, function (response) {
+		_state.mapLocations = response.items;
 		emitChange();
 	});
 
-	_Dispatcher2.default.on(_Constants.events.districtsLoaded, function (districts) {
-		_state.districts = districts;
-		_state.mapLocations = districts;
+	_Dispatcher2.default.on(_Constants.events.districtsLoaded, function (response) {
+		console.log(response);
+		_state.districts = response.items;
+		_state.mapLocations = response.items;
 		emitChange();
 	});
 
@@ -771,52 +857,56 @@ var _Dispatcher2 = _interopRequireDefault(_Dispatcher);
 
 var _Constants = require('../constants/Constants');
 
+var _events = require('events');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var SidebarStore = function () {
+var SidebarStore = Object.assign({}, _events.EventEmitter.prototype, function () {
 
+	//Default state container
 	var _state = {
 		listItems: []
 	};
 
-	//Let the views know that the state is changed
-	var emitChange = function emitChange() {
-		_Dispatcher2.default.emit(_Constants.events.sidebarStateChange, _state);
-	};
-
-	_Dispatcher2.default.on(_Constants.events.addSidebarItems, function (items) {
-		_state.listItems = _state.listItems.concat(items);
+	//Setting event Listeners, coming from actions
+	_Dispatcher2.default.on(_Constants.events.addSidebarItems, function (response) {
+		_state.complete = response.complete;
+		_state.listItems = _state.listItems.concat(response.items);
 		_state.loading = false;
-		emitChange();
-	});
-
-	_Dispatcher2.default.on(_Constants.events.setSidebarItems, function (items) {
-		_state.listItems = items;
+		SidebarStore.emitChange();
+	}).on(_Constants.events.setSidebarItems, function (response) {
+		_state.complete = response.complete;
+		_state.listItems = response.items;
 		_state.loading = false;
-		emitChange();
-	});
-
-	_Dispatcher2.default.on(_Constants.events.sidebarItemsWillBeSet, function () {
+		SidebarStore.emitChange();
+	}).on(_Constants.events.sidebarItemsWillBeSet, function () {
 		_state.listItems = [];
-		_state.loading = true;
-		emitChange();
+		_state.loading = "full";
+		SidebarStore.emitChange();
+	}).on(_Constants.events.sidebarItemsWillBeAdded, function () {
+		_state.loading = "partial";
+		SidebarStore.emitChange();
 	});
 
-	_Dispatcher2.default.on(_Constants.events.sidebarItemsWillBeAdded, function () {
-		_state.loading = true;
-		emitChange();
-	});
-
+	//Export public API
 	return {
+		//Getter to the state
+
 		getState: function getState() {
 			return _state;
+		},
+
+
+		//Emit the change event for the views
+		emitChange: function emitChange() {
+			this.emit(_Constants.events.change, _state);
 		}
 	};
-}();
+}());
 
 exports.default = SidebarStore;
 
-},{"../constants/Constants":14,"../dispatcher/Dispatcher":15}],18:[function(require,module,exports){
+},{"../constants/Constants":14,"../dispatcher/Dispatcher":15,"events":20}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

@@ -24,12 +24,18 @@ export default React.createClass({
     }
   },
 
+
   render() {
     return (
     	<div id="searchbox">
     		<ul className={"searchbox-options " + (this.state.open ? "open" : "")} onClick={this.toggleOpen}>
     			{this.state.typesOfSearch.map((type, i) => ( 
-    				<SearchBoxOption key={i} type={type} selected={type==this.props.type} handleClick={this.handleOptionClick.bind(this, type)} /> 
+    				<SearchBoxOption key={i} 
+                type={type} 
+                selected={type==this.props.type} 
+                handleClick={this.handleOptionClick.bind(this, type)} 
+                handleFilterChange={this.props.handleFilterChange} 
+                filterValue={this.props.filterValue} /> 
     			  )
     			)}
     		</ul>
@@ -37,7 +43,7 @@ export default React.createClass({
     			<a id="searchbox-filter" className="searchbox-button">Filter</a>
     			<a id="searchbox-sort" className="searchbox-button">Sort</a>
     		</div>
-        </div>
+      </div>
     );
   }
 

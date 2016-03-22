@@ -9,7 +9,7 @@ var MapActions = (function() {
   
   function requestDistricts(filter) {
     console.log('llea');
-    fetch(urls.districts)
+    fetch(urls.districts + "?limit=5000")
     .then((response) => {
      return response.json()
     })

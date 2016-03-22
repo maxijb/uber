@@ -6,36 +6,66 @@ import {default as SidebarActions} from '../actions/SidebarActions.js';
 import {default as SidebarStore} from '../stores/SidebarStore.js';
 import {events} from '../constants/Constants';
 
+
 export default React.createClass({
   
 
   componentDidMount() {
-    //subscribe to the UIState change and set state accordingly
-    pubsub.on(events.sidebarStateChange, this.handleChangeItems);
+    SidebarStore.on(events.change, this.handleStoreChange);
   },
 
 
   getInitialState() {
   	return {
   		type: 'movies',
-  		listItems: []
+  		listItems: [],
+  		filterValue: ''
   	}
   },
 
-  handleChangeItems(storeState) {
-  	this.setState({listItems: storeState.listItems});
+  handleStoreChange(storeState) {
+  	this.setState(storeState);
   },
 
   changeType(type) {
-  	this.setState({"type": type});
+  	this.setState({"type": type, filterValue: ''});
   	SidebarActions.changeType(type);
+  },
+
+  requestItems() {
+  	SidebarActions.requestItems(false, this.state.type, {
+  						offset: this.state.listItems.length, 
+  					});
+  },
+
+  handleFilterChange(value) {
+  	console.log(value);
+  	this.setState({filterValue: value});
+  	//TODO Debounce
+  	SidebarActions.requestItems(true, this.state.type, {
+  						name: value
+  					});
   },
 
   render: function() {
     return (
-    	<div id="sidebar">
-    		<SearchBox type={this.state.type} changeType={this.changeType} changeSearch={this.changeSearch} changeFilter={this.changeFilter} changeSort={this.changeSort}/>
-    		<SidebarList type={this.state.type} listItems={this.state.listItems} />
+    	<div id="sidebar" className={this.state.loading ? "loading"+this.state.loading : "" }>
+    		<SearchBox 
+    			type={this.state.type} 
+    			changeType={this.changeType} 
+    			handleFilterChange={this.handleFilterChange} 
+    			changeSearch={this.changeSearch} 
+    			changeSort={this.changeSort}
+    			filterValue={this.state.filterValue}
+    			/>
+    		
+    		<SidebarList 
+    			type={this.state.type} 
+    			listItems={this.state.listItems} 
+    			complete={this.state.complete}
+    			requestItems={this.requestItems}
+    			loading={this.state.loading}
+    			/>
         </div>
     );
   }

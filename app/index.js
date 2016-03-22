@@ -6,65 +6,94 @@ import {default as AppComponent} from '../assets/js/components/app';
 
 /* -------------- Config Application and Bootstrap ------------- */
 	
-	require('./dataset').init().then(startServer);
-
+	//Start app and configure views and assets
     let app = express();
 	app.engine('jade', require('jade').__express)
 	app.set('view engine', 'jade')
 
-	//move this to the promise for production
-	//startServer();
-
+	//Load the dataset and start server
+	require('./dataset').init().then(startServer);
 
 
 /* -------------- Server routes ------------- */
 
-function startServer(dataset) {
-	
-	console.log(__dirname);
-
-	app.use('/static', express.static(__dirname + '/../assets/public'));
-
-	app.get('/', function(req, res){
-	  res.render('index', {
-	  	  app: ReactDOMServer.renderToString(React.createElement(AppComponent, {}))
-	  })
-	})
-	
-	app.get('/api/locations', function(req, res){
-		res.send(dataset.getInstance().locations);
-	});
-
-	app.get('/api/movies', function(req, res){
-		res.send(dataset.getInstance().movies);
-	});
-
-	app.get('/api/districts', function(req, res){
-	  res.send(dataset.getInstance().districts);
-	})	
+	function startServer(dataset) {
+		
+		app.use('/static', express.static(__dirname + '/../assets/public'));
 
 
-	app.get('/api/actors', function(req, res){
-	  res.send(dataset.getInstance().persons.filter(person => {
-	  	return person && person.name && person.type.some(type => type == 'actor');
-	  }));
-	})	
+		// Render static page with React app
+		app.get('/', function(req, res){
+		  res.render('index', {
+		  	  app: ReactDOMServer.renderToString(React.createElement(AppComponent, {}))
+		  })
+		});
+		
+
+		
+	    // JSON API to fetch different kinds of data
+		app.get('/api/:resource', function(req, res){
+			
+			let resource, 
+				datasource, 
+				params;
+			
+			if (req.params.resource.match(/writers|actors|directors/)) {
+				resource = "persons";
+				params = Object.assign({type: req.params.resource}, req.query);
+			} else {
+				resource = req.params.resource;
+				params = req.query;
+			}
+
+			if (datasource = dataset.getInstance()[resource]) {
+				res.send(limitResponse(datasource, req.query));
+			} else {
+				res.status(404).send('Not found');
+			}
+
+		});
+
+		
+		//Start server
+		app.listen(3000, function() {
+		  console.log('Listening on port 3000...')
+		})
+
+	}
 
 
-	app.get('/api/directors', function(req, res){
-	  res.send(dataset.getInstance().persons.filter(person => {
-	  	return person && person.name && person.type.some(type => type == 'director');
-	  }));
-	})	
 
-	app.get('/api/writers', function(req, res){
-	  res.send(dataset.getInstance().persons.filter(person => {
-	  	return person && person.name && person.type.some(type => type == 'writer');
-	  }));
-	})	
+	/* Helper to return the desired data */
+	//Default respnse size and offset
+	const defaultOffset = 0;
+	const defaultLimit  = 30;
 
-	app.listen(3000, function() {
-	  console.log('Listening on port 3000...')
-	})
+	function limitResponse(data, params) {
 
-}
+		if (params.name) {
+			data = data.filter(item => {
+				return item && 
+				       item.name && 
+				       item.name.toLowerCase().indexOf(params.name.toLowerCase()) !== -1;
+
+			});
+		}
+		
+		if (params.type) {
+			data = data.filter(item => {
+				item && item.type && item.type.some(type => type == params.type)
+			});
+		}
+
+		const offset = parseInt(params.offset || defaultOffset, 10);
+		const limit  = offset + parseInt((params.limit || defaultLimit), 10);
+		
+		const fullLength = data.length;
+
+		data = data.slice(offset, limit);
+
+		console.log(fullLength, data.length);
+
+		return {items: data, complete: data.length == fullLength || data.length == 0};
+	}

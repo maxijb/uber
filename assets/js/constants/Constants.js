@@ -24,7 +24,9 @@ export const events = {
 	sidebarStateChange: 'sidebarStateChange',
 	sidebarItemsWillBeSet: 'sidebarItemsWillBeSet',
 
-	mapStateChange: 'mapStateChange'
+	mapStateChange: 'mapStateChange',
+
+	change: 'change'
 }
 
 export const urls = {

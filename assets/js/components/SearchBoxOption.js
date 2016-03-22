@@ -3,9 +3,20 @@ import {default as classes} from 'classnames';
 
 export default React.createClass({
 
+  getInitialState() {
+    return {
+       filterValue: ""
+    }
+  },
   
-  
+  resetFilter(event) {
+    event.stopPropagation();
+    this.props.handleFilterChange("");
+  },
 
+  handleFilterChange(event) {
+    this.props.handleFilterChange(event.target.value);
+  },
 
   render() {
 
@@ -17,8 +28,13 @@ export default React.createClass({
     	<li className={itemClass} onClick={this.props.handleClick}>
   			<span className="searchbox-option-title">{this.props.type}</span>
   			<div className="searchbox-option-search">
-  				<input type="text" className="searchbox-input" placeholder="Search..."/>
-  				<span className="icon icon-search">MAx</span>
+  				<input type="text" 
+                 className="searchbox-input" 
+                 value={this.props.filterValue}
+                 placeholder="Search..."
+                 onChange={this.handleFilterChange}
+                 />
+  				<span className="icon icon-search" onClick={this.resetFilter}>MAx</span>
   			</div>
   		</li>
     );
