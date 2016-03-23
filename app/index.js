@@ -1,7 +1,7 @@
 import {default as express} from 'express';
 import {default as React} from 'react';
 import {default as ReactDOMServer} from 'react-dom/server';
-import {default as AppComponent} from './assets/js/components/app';
+import {default as AppComponent} from '../assets/js/components/App';
 
 
 /* -------------- Config Application and Bootstrap ------------- */
