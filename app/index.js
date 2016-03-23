@@ -12,15 +12,12 @@ import {default as AppComponent} from '../assets/js/components/App';
 	app.set('view engine', 'jade')
 
 	//Load the dataset and start server
-	const dataset = require('./dataset');
-	dataset.init();
-
-	startServer();
+	require('./dataset').init().then(startServer);
 
 
 /* -------------- Server routes ------------- */
 
-	function startServer() {
+	function startServer(dataset) {
 		
 		app.use('/static', express.static(__dirname + '/../assets/public'));
 
