@@ -1,4 +1,5 @@
 import {default as React} from 'react';
+import {default as GoogleSVPoster} from '../helpers/GoogleSVPoster';
 
 export default React.createClass({
 
@@ -18,9 +19,28 @@ export default React.createClass({
 
     return (
     	<div className="map-popup">
-    		<p>{this.props.name}</p>
-    		<p>{this.props.loading ? "loading" : ""}</p>
-    		{movies}
+    		
+    		{(() => { 
+    			if (this.props.showPic) 
+    				return <GoogleSVPoster 
+    					lat={this.props.lat} 
+    					lng={this.props.lng} 
+    					width={150} 
+    					height={90} />
+    		})() }
+    		
+    		<p className="name">{this.props.name}</p>
+    		
+    		{(() => { 
+    			if (this.props.movieDetails.length) 
+    				return (
+    					<div className="movies-container">
+    						<p className="movies-header">Movies filmed here:</p>
+    						{movies}
+    					</div>
+    				);
+    		})() }
+    		
         </div>
     );
   }

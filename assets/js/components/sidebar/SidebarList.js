@@ -6,7 +6,7 @@ export default React.createClass({
   componentDidMount() {
     //we want to implement infinite scrolling
     //TODO: debounce
-    this.node = this.getDOMNode();
+    this.node = document.getElementById('sidebar-list');
     this.node.addEventListener('scroll', this.handleScroll)
   },
 

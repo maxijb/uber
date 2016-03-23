@@ -10,7 +10,7 @@ export default React.createClass({
   render() {
 
     let src = this.props.lat ? 
-    		  `https://maps.googleapis.com/maps/api/streetview?size=${this.props.width}x${this.props.height}&location=${this.props.lat},${this.props.lng}&heading=151.78&pitch=-0.76&key=${googleApiKey}` :
+    		  `https://maps.googleapis.com/maps/api/streetview?size=${this.props.width}x${this.props.height}&location=${this.props.lat},${this.props.lng}&heading=151.78&pitch=-0.76&key=AIzaSyCf3c3Ica2AWircgkTjlqxheiF642V3CRY` :
     		  defaultImgPlaceholder;
 
     return (

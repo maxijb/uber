@@ -9,7 +9,7 @@ export const googleResponseDefaultSF = {
 
 export const LeafletImagesPath = '/static/images/';
 export const LeafletMapTilesPath = 'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=';
-export const defaultImgPlaceholder = "/static/images/default-placeholder.jpg";
+export const defaultImgPlaceholder = "/static/images/default-placeholder.png";
 
 export const actions = {
 	appLoad: 'appLoad',

@@ -39,10 +39,6 @@ export default React.createClass({
     			  )
     			)}
     		</ul>
-    		<div id="searchbox-buttons">
-    			<a id="searchbox-filter" className="searchbox-button">Filter</a>
-    			<a id="searchbox-sort" className="searchbox-button">Sort</a>
-    		</div>
       </div>
     );
   }

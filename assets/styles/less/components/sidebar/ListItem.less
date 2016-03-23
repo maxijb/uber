@@ -2,15 +2,39 @@
 
 .list-item {
 	clear: both;
-    padding: 5px 20px;
+    padding: 10px 15px 5px;
     background: white;
     overflow: hidden;
     margin: 2px 0px;
     cursor: pointer;
 
+    .year {
+        font-size: 0.8em;
+    }
+
+    .rating {
+        font-size: 0.8em;
+        color: @accent;
+        padding-left: 10px;
+        margin-left: 10px;
+        border-left: 2px solid #ccc;
+    }
+
+    .name {
+        color: @primary;
+        font-weight: bold;
+    }
+
+
     &.selected {
         background: @secondary;
         color: white;
+        .rating {
+
+        }
+        .name {
+            color: white;
+        }
     }
 
     &:odd {
@@ -21,5 +45,6 @@
 		float: left;
 		height: 40px;
 		width: 30px;
+        margin-right: 10px;
 	}
 }

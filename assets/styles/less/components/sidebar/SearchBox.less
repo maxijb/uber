@@ -4,7 +4,7 @@
 .searchbox-option {
 	display: none;
 	background: @accent;
-	padding: @half-padding @padding;
+	padding: @half-padding @padding @padding;
 
 	&.selected {
 		display: block;
@@ -42,39 +42,25 @@
 		    box-sizing: border-box;
 		    margin: 2px 0;
 		    font-size: 0.8em;
+
+		    &:focus + .icon {
+		    	color: @accent;
+		    }
 		}
 
 		.icon {
 			position: absolute;
-		    top: 7px;
+		    top: 9px;
 		    right: 13px;
 		    display: block;
+		    cursor: pointer;
+		    color: #ccc;
 		}
+
+
 	}
 
 }
-
-
-#searchbox-buttons {
-		display: table;
-		width: 100%;
-		color: white;
-
-
-		.searchbox-button {
-			display: table-cell;
-			background: @primary;
-			text-align: center;
-			padding: 3px 0;
-			width: 50%;
-			font-weight: bold;
-			cursor: pointer;
-			
-			&:first-child {
-				border-right: 2px solid white;
-			}
-		}
-	}
 
 
 .searchbox-options {

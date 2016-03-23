@@ -233,38 +233,146 @@ if (typeof window !== "undefined") {
 }
 
 },{"../actions/MapActions":1,"../constants/Constants":23,"../stores/MapStore":25,"./DetailsBar":4,"./Header":5,"./Map":6,"./Sidebar":7,"./StatusBar":8,"react":188,"react-dom":31}],4:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _react = require("react");
+var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
+
+var _ImdbPoster = require('./helpers/ImdbPoster');
+
+var _ImdbPoster2 = _interopRequireDefault(_ImdbPoster);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = _react2.default.createClass({
-  displayName: "DetailsBar",
+  displayName: 'DetailsBar',
+  renderMovie: function renderMovie(props) {
+
+    console.log(this.props);
+
+    var rating = props && !isNaN(props.imdbRating) ? Array.apply(null, Array(Math.round(props.imdbRating / 2))).map(function (x, i) {
+      return _react2.default.createElement('span', { key: i, className: 'icon-star-full' });
+    }) : null;
+
+    return _react2.default.createElement(
+      'div',
+      { className: 'details-bar-content' },
+      _react2.default.createElement(_ImdbPoster2.default, { poster: props.poster }),
+      _react2.default.createElement(
+        'div',
+        { className: 'details-bar-main' },
+        _react2.default.createElement(
+          'p',
+          { className: 'title' },
+          props.name
+        ),
+        function () {
+          return props.release_year && _react2.default.createElement(
+            'span',
+            { className: 'year' },
+            props.release_year
+          );
+        }(),
+        function () {
+          return rating && _react2.default.createElement(
+            'span',
+            { className: 'rating' },
+            rating,
+            ' (',
+            props.imdbVotes,
+            ' votes)'
+          );
+        }(),
+        _react2.default.createElement(
+          'div',
+          { className: 'plot' },
+          props.plot
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'awards' },
+          props.awards
+        )
+      ),
+      _react2.default.createElement(
+        'div',
+        { className: 'details-bar-sidebar' },
+        _react2.default.createElement(
+          'p',
+          { className: 'key genre' },
+          'Genre: ',
+          _react2.default.createElement(
+            'span',
+            { className: 'value' },
+            props.genre
+          )
+        ),
+        _react2.default.createElement(
+          'p',
+          { className: 'key rated' },
+          'Rated: ',
+          _react2.default.createElement(
+            'span',
+            { className: 'value' },
+            props.rated
+          )
+        ),
+        _react2.default.createElement(
+          'p',
+          { className: 'key runtime' },
+          'Runtime: ',
+          _react2.default.createElement(
+            'span',
+            { className: 'value' },
+            props.runtime
+          )
+        ),
+        _react2.default.createElement(
+          'p',
+          { className: 'key language' },
+          'Language: ',
+          _react2.default.createElement(
+            'span',
+            { className: 'value' },
+            props.language
+          )
+        ),
+        _react2.default.createElement(
+          'p',
+          { className: 'key producer' },
+          'Producer: ',
+          _react2.default.createElement(
+            'span',
+            { className: 'value' },
+            props.production_company
+          )
+        )
+      )
+    );
+  },
 
 
   render: function render() {
+    var _this = this;
+
     return _react2.default.createElement(
-      "div",
-      { id: "details-bar", className: this.props.highlight ? "visible " + this.props.highlight.type : "" },
-      _react2.default.createElement("a", { className: "details-bar-close icon icon-cross", onClick: this.props.close }),
-      _react2.default.createElement(
-        "div",
-        { className: "details-bar-content" },
-        JSON.stringify(this.props.highlight)
-      )
+      'div',
+      { id: 'details-bar', className: this.props.highlight ? "visible " + this.props.highlight.type : "" },
+      _react2.default.createElement('a', { className: 'details-bar-close icon icon-cross', onClick: this.props.close }),
+      function () {
+        if (_this.props.highlight) return _this.props.highlight == "location" ? _this.renderLocation(_this.props) : _this.renderMovie(_this.props.highlight.data);
+      }()
     );
   }
 
 });
 
-},{"react":188}],5:[function(require,module,exports){
+},{"./helpers/ImdbPoster":10,"react":188}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -406,9 +514,12 @@ exports.default = _react2.default.createClass({
     }
   },
   updateOpenMarkerPopup: function updateOpenMarkerPopup(details) {
-    //Update last marker popup
-    if (details && this.markers[details.id] && !this.markers[details.id].fullyLoaded) {
-      this.markers[details.id].addPopupProperties(details);
+    //Find the marker to update
+    var marker = details ? this.markers[details.id] : null;
+
+    //If it still exists and needs data, load it
+    if (marker && !marker.fullyLoaded && marker.addPopupProperties) {
+      marker.addPopupProperties(details);
     }
   },
   updateMarkers: function updateMarkers() {
@@ -449,7 +560,7 @@ exports.default = _react2.default.createClass({
     marker.openPopup();
 
     //update marker popup if required
-    if (!marker.fullyLoaded) {
+    if (!marker.fullyLoaded && marker.addPopupProperties) {
       marker.addPopupProperties({ showPic: true, loading: true });
       _MapActions2.default.requestLocationDetails(location.id);
     }
@@ -475,7 +586,12 @@ exports.default = _react2.default.createClass({
     });
 
     if (this.state.anyFiltersApplied && pois != this.state.districts) {
-      this.map.fitBounds(this.markerLayer.getBounds());
+      //get bound of the markes
+      var bounds = this.markerLayer.getBounds();
+      //it could be empty, so check first
+      if (bounds.isValid()) {
+        this.map.fitBounds(bounds);
+      }
     }
   },
 
@@ -668,7 +784,7 @@ exports.default = _react2.default.createClass({
   displayName: 'GoogleSVPoster',
   render: function render() {
 
-    var src = this.props.lat ? 'https://maps.googleapis.com/maps/api/streetview?size=' + this.props.width + 'x' + this.props.height + '&location=' + this.props.lat + ',' + this.props.lng + '&heading=151.78&pitch=-0.76&key=' + _Constants.googleApiKey : _Constants.defaultImgPlaceholder;
+    var src = this.props.lat ? 'https://maps.googleapis.com/maps/api/streetview?size=' + this.props.width + 'x' + this.props.height + '&location=' + this.props.lat + ',' + this.props.lng + '&heading=151.78&pitch=-0.76&key=AIzaSyCf3c3Ica2AWircgkTjlqxheiF642V3CRY' : _Constants.defaultImgPlaceholder;
 
     return _react2.default.createElement('img', { src: src });
   }
@@ -685,21 +801,29 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _Constants = require('../../constants/Constants');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = _react2.default.createClass({
   displayName: 'ImdbPoster',
   render: function render() {
 
-    if (!this.props.poster) return null;
+    var src = void 0;
 
-    var src = this.props.size ? this.props.poster.replace('300.jpg', this.props.size + '.jpg') : this.props.poster;
+    //if null image fallback to placeholder
+    if (!this.props.poster || this.props.poster == 'N/A') {
+      src = _Constants.defaultImgPlaceholder;
+    } else {
+      //otherwise show it
+      src = this.props.size ? this.props.poster.replace('300.jpg', this.props.size + '.jpg') : this.props.poster;
+    }
 
     return _react2.default.createElement('img', { src: src });
   }
 });
 
-},{"react":188}],11:[function(require,module,exports){
+},{"../../constants/Constants":23,"react":188}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -819,20 +943,24 @@ exports.default = _react2.default.createClass({
 });
 
 },{"react":188}],14:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _react = require("react");
+var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
+
+var _GoogleSVPoster = require('../helpers/GoogleSVPoster');
+
+var _GoogleSVPoster2 = _interopRequireDefault(_GoogleSVPoster);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = _react2.default.createClass({
-  displayName: "MapPopup",
+  displayName: 'MapPopup',
   getDefaultProps: function getDefaultProps() {
     return {
       movieDetails: []
@@ -841,35 +969,49 @@ exports.default = _react2.default.createClass({
 
 
   render: function render() {
+    var _this = this;
 
     var movies = this.props.movieDetails.map(function (movie) {
       return _react2.default.createElement(
-        "a",
-        { key: movie.id, className: "trigger movies", "data-highlight": "movies", "data-id": movie.id, "data-data": JSON.stringify(movie) },
+        'a',
+        { key: movie.id, className: 'trigger movies', 'data-highlight': 'movies', 'data-id': movie.id, 'data-data': JSON.stringify(movie) },
         movie.name
       );
     });
 
     return _react2.default.createElement(
-      "div",
-      { className: "map-popup" },
+      'div',
+      { className: 'map-popup' },
+      function () {
+        if (_this.props.showPic) return _react2.default.createElement(_GoogleSVPoster2.default, {
+          lat: _this.props.lat,
+          lng: _this.props.lng,
+          width: 150,
+          height: 90 });
+      }(),
       _react2.default.createElement(
-        "p",
-        null,
+        'p',
+        { className: 'name' },
         this.props.name
       ),
-      _react2.default.createElement(
-        "p",
-        null,
-        this.props.loading ? "loading" : ""
-      ),
-      movies
+      function () {
+        if (_this.props.movieDetails.length) return _react2.default.createElement(
+          'div',
+          { className: 'movies-container' },
+          _react2.default.createElement(
+            'p',
+            { className: 'movies-header' },
+            'Movies filmed here:'
+          ),
+          movies
+        );
+      }()
     );
   }
 
 });
 
-},{"react":188}],15:[function(require,module,exports){
+},{"../helpers/GoogleSVPoster":9,"react":188}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1194,20 +1336,6 @@ exports.default = _react2.default.createClass({
             handleFilterChange: _this.props.handleFilterChange,
             filterValue: _this.props.filterValue });
         })
-      ),
-      _react2.default.createElement(
-        'div',
-        { id: 'searchbox-buttons' },
-        _react2.default.createElement(
-          'a',
-          { id: 'searchbox-filter', className: 'searchbox-button' },
-          'Filter'
-        ),
-        _react2.default.createElement(
-          'a',
-          { id: 'searchbox-sort', className: 'searchbox-button' },
-          'Sort'
-        )
       )
     );
   }
@@ -1293,7 +1421,7 @@ exports.default = _react2.default.createClass({
   componentDidMount: function componentDidMount() {
     //we want to implement infinite scrolling
     //TODO: debounce
-    this.node = this.getDOMNode();
+    this.node = document.getElementById('sidebar-list');
     this.node.addEventListener('scroll', this.handleScroll);
   },
   getDefaultProps: function getDefaultProps() {
@@ -1367,7 +1495,7 @@ var googleResponseDefaultSF = exports.googleResponseDefaultSF = {
 
 var LeafletImagesPath = exports.LeafletImagesPath = '/static/images/';
 var LeafletMapTilesPath = exports.LeafletMapTilesPath = 'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=';
-var defaultImgPlaceholder = exports.defaultImgPlaceholder = "/static/images/default-placeholder.jpg";
+var defaultImgPlaceholder = exports.defaultImgPlaceholder = "/static/images/default-placeholder.png";
 
 var actions = exports.actions = (_actions = {
 	appLoad: 'appLoad',

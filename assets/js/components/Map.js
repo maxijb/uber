@@ -66,9 +66,12 @@ export default React.createClass({
   },
 
   updateOpenMarkerPopup(details) {
-    //Update last marker popup
-    if (details && this.markers[details.id] && !this.markers[details.id].fullyLoaded) {
-         this.markers[details.id].addPopupProperties(details);
+    //Find the marker to update
+    const marker = details ? this.markers[details.id] : null;
+
+    //If it still exists and needs data, load it
+    if (marker && !marker.fullyLoaded && marker.addPopupProperties) {
+            marker.addPopupProperties(details);
     }
   },
 
@@ -113,7 +116,7 @@ export default React.createClass({
     marker.openPopup();
     
     //update marker popup if required
-    if (!marker.fullyLoaded) {
+    if (!marker.fullyLoaded && marker.addPopupProperties) {
       marker.addPopupProperties({showPic: true, loading: true});
       MapActions.requestLocationDetails(location.id);
     }
@@ -142,7 +145,12 @@ export default React.createClass({
   	});
 
     if (this.state.anyFiltersApplied && pois != this.state.districts) {
-      this.map.fitBounds(this.markerLayer.getBounds());
+      //get bound of the markes
+      const bounds = this.markerLayer.getBounds();
+      //it could be empty, so check first
+      if (bounds.isValid()) {
+        this.map.fitBounds(bounds);
+      }
     }
 
   },
