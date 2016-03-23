@@ -1,12 +1,16 @@
+@import '../../_variables';
+
 .list-item {
 	clear: both;
     padding: 5px 20px;
     background: white;
     overflow: hidden;
     margin: 2px 0px;
+    cursor: pointer;
 
     &.selected {
-        background: blue;
+        background: @secondary;
+        color: white;
     }
 
     &:odd {

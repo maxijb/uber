@@ -74,17 +74,21 @@ export default React.createClass({
 
   updateMarkers() {
     
-
     //decide whether to show districts or locations' icons
     let source, type, needUpdate, method;
     
-    if (!this.state.mapLocations.length || (this.state.mapLocations.length >= 100 && this.map.getZoom() < 14)) {
+    //Decide whether to render locations or neighborhoods
+    if (!this.state.anyFiltersApplied && (!this.state.mapLocations.length || (this.state.mapLocations.length >= 100 && this.map.getZoom() < 14))) {
+      
+      // We only need to update if we weren't showing ditricts
       if (this.state.type !== "district") {
         this.setState({renderedLocations: this.state.districts, type: "district"});
         this.renderMarkers(this.state.districts, this.handleDistrictClick);  
       }
       
     } else {
+      //if we need to render locations' markers
+      //we need to check that the lists are different
       if (this.state.mapLocations !== this.state.renderedLocations) {
         this.setState({renderedLocations: this.state.mapLocations, type: "location"});
         this.renderMarkers(this.state.mapLocations, this.handleLocationClick);
@@ -107,6 +111,7 @@ export default React.createClass({
 
   handleLocationClick(location, marker, event) {
     marker.openPopup();
+    
     //update marker popup if required
     if (!marker.fullyLoaded) {
       marker.addPopupProperties({showPic: true, loading: true});

@@ -15,27 +15,27 @@ export default React.createClass({
   },
 
   render: function() {
-  	let items = Object.keys(this.props.filters).reduce((prev, filter) => {
-  			if (this.props.filters[filter]) 
-  				prev.push({type: filter, value: this.props.filters[filter]})
+  	const filters = Object.keys(this.props.filters).reduce((prev, filter) => {
+  			if (this.props.filters[filter]) prev.push({type: filter, value: this.props.filters[filter]})
 
   			return prev;
-  		}, [])
-  	.map((filter, i)=> {
+  		}, []);
+  	
+    const items = filters.map((filter, i)=> {
   		return (
-  			<div key={i}>{filter.type}: {filter.value.name}
-  				<span onClick={this.removeFilter.bind(this, filter)}>XX</span>
+  			<div key={i} className="statusbar-item">
+          <span className="type">{filter.type}:</span> 
+          <span className="value">{filter.value.name}</span>
+  				<span onClick={this.removeFilter.bind(this, filter)} className="icon-cross"></span>
   			</div>
   		)
-	});
-
-  	console.log(items);
+	  });
 
     return (
-    	<div id="status-bar">
-    		{items}
-        </div>
-    );
-  }
+      	<div id="status-bar" className={filters.length ? "visible" : ""}>
+      		{items}
+          </div>
+      );
+    }
 
 });

@@ -76,7 +76,8 @@ var MapActions = function () {
     selectDistrict: selectDistrict,
     removeFilter: removeFilter,
     requestLocationDetails: requestLocationDetails,
-    openHighlight: openHighlight
+    openHighlight: openHighlight,
+    closeHighlight: closeHighlight
   };
 }();
 
@@ -418,12 +419,17 @@ exports.default = _react2.default.createClass({
         needUpdate = void 0,
         method = void 0;
 
-    if (!this.state.mapLocations.length || this.state.mapLocations.length >= 100 && this.map.getZoom() < 14) {
+    //Decide whether to render locations or neighborhoods
+    if (!this.state.anyFiltersApplied && (!this.state.mapLocations.length || this.state.mapLocations.length >= 100 && this.map.getZoom() < 14)) {
+
+      // We only need to update if we weren't showing ditricts
       if (this.state.type !== "district") {
         this.setState({ renderedLocations: this.state.districts, type: "district" });
         this.renderMarkers(this.state.districts, this.handleDistrictClick);
       }
     } else {
+      //if we need to render locations' markers
+      //we need to check that the lists are different
       if (this.state.mapLocations !== this.state.renderedLocations) {
         this.setState({ renderedLocations: this.state.mapLocations, type: "location" });
         this.renderMarkers(this.state.mapLocations, this.handleLocationClick);
@@ -441,6 +447,7 @@ exports.default = _react2.default.createClass({
   },
   handleLocationClick: function handleLocationClick(location, marker, event) {
     marker.openPopup();
+
     //update marker popup if required
     if (!marker.fullyLoaded) {
       marker.addPopupProperties({ showPic: true, loading: true });
@@ -608,30 +615,34 @@ exports.default = _react2.default.createClass({
   render: function render() {
     var _this = this;
 
-    var items = Object.keys(this.props.filters).reduce(function (prev, filter) {
+    var filters = Object.keys(this.props.filters).reduce(function (prev, filter) {
       if (_this.props.filters[filter]) prev.push({ type: filter, value: _this.props.filters[filter] });
 
       return prev;
-    }, []).map(function (filter, i) {
+    }, []);
+
+    var items = filters.map(function (filter, i) {
       return _react2.default.createElement(
         'div',
-        { key: i },
-        filter.type,
-        ': ',
-        filter.value.name,
+        { key: i, className: 'statusbar-item' },
         _react2.default.createElement(
           'span',
-          { onClick: _this.removeFilter.bind(_this, filter) },
-          'XX'
-        )
+          { className: 'type' },
+          filter.type,
+          ':'
+        ),
+        _react2.default.createElement(
+          'span',
+          { className: 'value' },
+          filter.value.name
+        ),
+        _react2.default.createElement('span', { onClick: _this.removeFilter.bind(_this, filter), className: 'icon-cross' })
       );
     });
 
-    console.log(items);
-
     return _react2.default.createElement(
       'div',
-      { id: 'status-bar' },
+      { id: 'status-bar', className: filters.length ? "visible" : "" },
       items
     );
   }
@@ -639,31 +650,31 @@ exports.default = _react2.default.createClass({
 });
 
 },{"../actions/MapActions.js":1,"react":188}],9:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _react = require("react");
+var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
+
+var _Constants = require('../../constants/Constants');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = _react2.default.createClass({
-  displayName: "GoogleSVPoster",
+  displayName: 'GoogleSVPoster',
   render: function render() {
 
-    console.log("PAASA");
-    var src = "https://maps.googleapis.com/maps/api/streetview?size=" + this.props.width + "x" + this.props.height + "&location=" + this.props.lat + "," + this.props.lng + "&heading=151.78&pitch=-0.76&key=AIzaSyCf3c3Ica2AWircgkTjlqxheiF642V3CRY";
-    console.log(src);
+    var src = this.props.lat ? 'https://maps.googleapis.com/maps/api/streetview?size=' + this.props.width + 'x' + this.props.height + '&location=' + this.props.lat + ',' + this.props.lng + '&heading=151.78&pitch=-0.76&key=' + _Constants.googleApiKey : _Constants.defaultImgPlaceholder;
 
-    return _react2.default.createElement("img", { src: src });
+    return _react2.default.createElement('img', { src: src });
   }
 });
 
-},{"react":188}],10:[function(require,module,exports){
+},{"../../constants/Constants":23,"react":188}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -972,9 +983,6 @@ exports.default = _react2.default.createClass({
     var _this = this;
 
     var item = this.props.item;
-    var rating = item && item.imdbRating ? Array.apply(null, Array(Math.round(item.imdbRating / 2))).map(function (x, i) {
-      return _react2.default.createElement('span', { key: i, className: 'icon-star-full' });
-    }) : null;
 
     return _react2.default.createElement(
       'div',
@@ -1026,9 +1034,6 @@ exports.default = _react2.default.createClass({
     return _react2.default.createElement(
       'div',
       { className: 'list-item-content locations' },
-      function () {
-        return item.lat && _react2.default.createElement(_GoogleSVPoster2.default, { width: 100, height: 100, lat: item.lat, lng: item.lng });
-      }(),
       _react2.default.createElement(
         'p',
         { className: 'name' },
@@ -1039,11 +1044,6 @@ exports.default = _react2.default.createClass({
         { className: 'movies-quantity' },
         _react2.default.createElement('span', { className: 'icon-film' }),
         item.movies ? item.movies.length : 0
-      ),
-      _react2.default.createElement(
-        'span',
-        { className: 'district' },
-        item.district
       )
     );
   }
@@ -1074,7 +1074,8 @@ exports.default = _react2.default.createClass({
   render: function render() {
 
     var item = this.props.item;
-    var rating = item && item.imdbRating ? Array.apply(null, Array(Math.round(item.imdbRating / 2))).map(function (x, i) {
+    //console.log(item.imdbRating);
+    var rating = item && !isNaN(item.imdbRating) ? Array.apply(null, Array(Math.round(item.imdbRating / 2))).map(function (x, i) {
       return _react2.default.createElement('span', { key: i, className: 'icon-star-full' });
     }) : null;
 
@@ -1316,7 +1317,6 @@ exports.default = _react2.default.createClass({
 
   //handle the scrolling event and request more items if we've scrolled beyond 80% of the bar
   handleScroll: function handleScroll() {
-    console.log(!this.props.loading && !this.props.complete && this.node.scrollTop + this.node.offsetHeight > this.node.scrollHeight * 0.8);
     if (!this.props.loading && !this.props.complete && this.node.scrollTop + this.node.offsetHeight > this.node.scrollHeight * 0.8) {
       this.props.requestItems();
     }
@@ -1329,7 +1329,11 @@ exports.default = _react2.default.createClass({
     var selectedId = this.props.filters[this.props.type] ? this.props.filters[this.props.type].id : null;
 
     var items = this.props.listItems.map(function (item) {
-      if (item) return _react2.default.createElement(_ListItem2.default, { key: item.id, type: _this.props.type, item: item, selectFilter: _this.props.selectFilter, selected: selectedId == item.id });
+      if (item && item.name) return _react2.default.createElement(_ListItem2.default, { key: item.id,
+        type: _this.props.type,
+        item: item,
+        selectFilter: _this.props.selectFilter,
+        selected: selectedId == item.id });
     });
 
     return _react2.default.createElement(

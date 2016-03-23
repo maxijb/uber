@@ -16,12 +16,7 @@ export default React.createClass({
   render: function() {
   	
     const item = this.props.item;
-    const rating = item && item.imdbRating ? 
-                      Array.apply(null, Array(Math.round(item.imdbRating/2))).map((x,i) => { 
-                        return ( <span key={i} className="icon-star-full"></span> )
-                      }) 
-                      : null;
-
+  
     return (
     	<div className={"list-item " + (this.props.selected ? "selected" : "")} onClick={this.handleClick}>
     		

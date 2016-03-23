@@ -12,17 +12,13 @@ export default React.createClass({
     return (
     	<div className="list-item-content locations">
     		
-        {(() => item.lat && ( <GoogleSVPoster width={100} height={100} lat={item.lat} lng={item.lng} /> ) )()}
-        
         <p className="name">{item.name}</p>
 
         <span className="movies-quantity">
           <span className="icon-film"></span>
-          {item.movies ? item.movies.length : 0}
+          { item.movies ? item.movies.length : 0 }
         </span>
 
-        <span className="district">{item.district}</span>
-        
       </div>
     );
   }

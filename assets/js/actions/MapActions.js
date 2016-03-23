@@ -78,7 +78,8 @@ var MapActions = (function() {
     selectDistrict,
     removeFilter,
     requestLocationDetails,
-    openHighlight
+    openHighlight,
+    closeHighlight
   }
 
 

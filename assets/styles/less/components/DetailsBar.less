@@ -1,0 +1,27 @@
+@import '../_variables';
+
+#details-bar { 
+	position: absolute;
+	left: 30%;
+	right: 0;
+	bottom: -300px;
+	background: #666;
+	height: 300px;
+	z-index: 10;	
+	-webkit-transition: bottom 1s ease;
+	  -moz-transition: bottom 1s ease;
+	  -o-transition: bottom 1s ease;
+	  -ms-transition: bottom 1s ease;
+	  transition: bottom 1s ease;
+
+	&.visible {
+		bottom: 0;
+	}
+}
+
+@media (max-width: 833px) {
+	#details-bar {
+		left: 250px;
+	}
+}
+

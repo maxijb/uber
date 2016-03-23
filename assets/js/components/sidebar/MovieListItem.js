@@ -6,7 +6,8 @@ export default React.createClass({
   render: function() {
   	
     const item = this.props.item;
-    const rating = item && item.imdbRating ? 
+    //console.log(item.imdbRating);
+    const rating = item && !isNaN(item.imdbRating) ? 
                       Array.apply(null, Array(Math.round(item.imdbRating/2))).map((x,i) => { 
                         return ( <span key={i} className="icon-star-full"></span> )
                       }) 
