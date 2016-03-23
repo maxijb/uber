@@ -1,5 +1,6 @@
 import {default as pubsub} from '../dispatcher/Dispatcher';
 import {actions, events, urls} from '../constants/Constants';
+import {queryString} from '../components/helpers/helpers';
 
 var SidebarActions = (function() {
 
@@ -7,12 +8,13 @@ var SidebarActions = (function() {
   
 
   function changeType(type) {
-     pubsub.emit(events.sidebarItemsWillBeSet);
      requestItems(true, type);
   }
 
  
   function requestItems(setNewItems, type, options) {
+    
+    pubsub.emit(setNewItems ? events.sidebarItemsWillBeSet : events.sidebarItemsWillBeAdded);
 
     fetch(urls[type] + queryString(options))
     .then((response) => {
@@ -26,20 +28,18 @@ var SidebarActions = (function() {
   }
   
 
+  function selectFilter(filter) {
+    pubsub.emit(actions.addFilter, filter);
+  }
+
   return {
     requestItems,
-    changeType
+    changeType,
+    selectFilter
   }
 
 
-  function queryString(obj) {
-    var str = [];
-    for(var p in obj)
-      if (obj.hasOwnProperty(p)) {
-        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-      }
-    return "?" + str.join("&");
-  }
+  
 
 
 

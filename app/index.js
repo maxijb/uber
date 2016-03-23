@@ -30,10 +30,43 @@ import {default as AppComponent} from '../assets/js/components/app';
 		});
 		
 
+
+		app.get('/api/locationDetails', function(req, res) {
+			let movies = dataset.getInstance().movies;
+			let location = Object.assign({}, dataset.getInstance().locations[req.query.id]);
+			location.movieDetails = location.movies.map((movie_id) => {
+				return movies[movie_id];
+			});
+
+			res.send({details: location});
+
+
+		});
+
+
+		app.get('/api/locations', function(req, res) {
+
+			let data = dataset.getInstance().locations;
+
+			if (typeof req.query.locations !== "undefined") {
+				data = [data[req.query.locations]];
+			}
+
+			if (typeof req.query.district !== "undefined") {
+				data = data.filter(item => { return item && item.district == req.query.district });
+			}
+
+			if (typeof req.query.movies !== "undefined") {
+				data = data.filter(item => { return item && item.movies.some(movie => movie == req.query.movies ) });
+			}
+
+			res.send({items: data});
+		})
+
 		
 	    // JSON API to fetch different kinds of data
 		app.get('/api/:resource', function(req, res){
-			
+
 			let resource, 
 				datasource, 
 				params;
@@ -80,11 +113,13 @@ import {default as AppComponent} from '../assets/js/components/app';
 			});
 		}
 		
+		//for persons
 		if (params.type) {
 			data = data.filter(item => {
 				item && item.type && item.type.some(type => type == params.type)
 			});
 		}
+
 
 		const offset = parseInt(params.offset || defaultOffset, 10);
 		const limit  = offset + parseInt((params.limit || defaultLimit), 10);

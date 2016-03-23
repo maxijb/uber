@@ -23,11 +23,12 @@ export default React.createClass({
 
   //only update if the list has changed, we use immutable arrays! 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.listItems !== this.props.listItems;
+    return nextProps.listItems !== this.props.listItems || nextProps.filters !== this.props.filters;
   },
 
   //handle the scrolling event and request more items if we've scrolled beyond 80% of the bar
   handleScroll() {
+    console.log((!this.props.loading && !this.props.complete && this.node.scrollTop + this.node.offsetHeight > this.node.scrollHeight * 0.8));
     if (!this.props.loading && !this.props.complete && this.node.scrollTop + this.node.offsetHeight > this.node.scrollHeight * 0.8) {
        this.props.requestItems();
     }
@@ -35,8 +36,10 @@ export default React.createClass({
 
   render: function() {
   	
+    var selectedId = this.props.filters[this.props.type] ? this.props.filters[this.props.type].id : null;
+
     const items = this.props.listItems.map(item => {
-  		if (item) return ( <ListItem key={item.id} item={item}/> )
+  		if (item) return ( <ListItem key={item.id} item={item} selectFilter={this.props.selectFilter} selected={selectedId == item.id} /> )
   	});
 
     return (
@@ -44,7 +47,7 @@ export default React.createClass({
     		{items}
       </div>
     );
-    
+
   }
 
 });

@@ -49,6 +49,9 @@ header h1 span {
     left: 250px;
   }
 }
+.district-popup {
+  pointer-events: none !important;
+}
 
 #sidebar {
   width: 30%;
@@ -60,12 +63,25 @@ header h1 span {
   min-width: 250px;
 }
 
+#status-bar {
+  heigth: 100px;
+  width: 400px;
+  background: white;
+  position: absolute;
+  z-index: 89;
+  left: 250px;
+  top: 50px;
+}
+
 .list-item {
   clear: both;
   padding: 5px 20px;
   background: white;
   overflow: hidden;
   margin: 2px 0px;
+}
+.list-item.selected {
+  background: blue;
 }
 .list-item:odd {
   background: #eee;

@@ -1,37 +1,39 @@
 import {default as pubsub} from '../dispatcher/Dispatcher';
 import {events} from '../constants/Constants';
+import {EventEmitter} from 'events';
 
-const SidebarStore = (() => {
+const MapStore = Object.assign({}, EventEmitter.prototype, (() => {
 
 	let _state = {
-		listItems: []
+		districts: [],
+		mapLocations: []
 	};
 
-	//Let the views know that the state is changed
-	let emitChange = () => { pubsub.emit(events.mapStateChange, _state); }
-
-
-
-	pubsub.on(events.locationsLoaded, (response) => {
-		_state.mapLocations = response.items;
-		emitChange();
-	});
-
-
-	pubsub.on(events.districtsLoaded, (response) => {
-		console.log(response);
-		_state.districts = response.items;
-		_state.mapLocations = response.items;
-		emitChange();
-	});
+	pubsub
+		.on(events.locationsLoaded, (response) => {
+			_state.mapLocations = response.items;
+			MapStore.emitChange();
+		})
+		.on(events.districtsLoaded, (response) => {
+			_state.districts = response.items;
+			MapStore.emitChange();
+		})
+		.on(events.locationDetailsLoaded, (response) => {
+			_state.lastDetails = response.details;
+			MapStore.emitChange();
+		});
 	
 
 	return {
-		getState() { return _state } 
+		getState() { return _state } ,
+		//Emit the change event for the views
+		emitChange() { 
+			this.emit(events.change, _state);
+		}
 	}
 
 
-})();
+})());
 
 
-export default SidebarStore;
+export default MapStore;

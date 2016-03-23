@@ -10,6 +10,7 @@ import {default as Header} from './Header';
 import {default as Sidebar} from './Sidebar';
 import {default as Map} from './Map';
 import {default as DetailsBar} from './DetailsBar';
+import {default as StatusBar} from './StatusBar';
 
 
 let App = React.createClass({
@@ -19,7 +20,7 @@ let App = React.createClass({
     Actions.appLoad();
 
     //subscribe to the UIState change and set state accordingly
-    pubsub.on(events.changeState, this.handleChange);
+    UIStore.on(events.change, this.handleChange);
 
   },  
 
@@ -28,12 +29,13 @@ let App = React.createClass({
     return {
       districts: [],
       mapLocations: [],
-      movies: []
+      movies: [],
+      filters: {}
     }
   },
 
-  handleChange() {
-    this.setState(UIStore.getState());
+  handleChange(state) {
+    this.setState(state);
   },
 
   render() {
@@ -41,7 +43,8 @@ let App = React.createClass({
     	<div id="main-app">
     		<Header/>
     		<div id="main-container">
-    			<Sidebar />
+    			<Sidebar filters={this.state.filters} />
+          <StatusBar filters={this.state.filters} />
     			<Map districts={this.state.districts} mapLocations={this.state.mapLocations} />
     			<DetailsBar />
     		</div>

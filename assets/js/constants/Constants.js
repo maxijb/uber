@@ -4,12 +4,19 @@ export const googleResponseDefaultSF = {
 		lat: 37.77493,
 		lng: -122.419416,
 		place_id : "ChIJIQBpAG2ahYAR_6128GcTUEo",
-		zoom: 12
+		zoom: 13
 	};
+
+export const LeafletImagesPath = '/static/images/';
+export const LeafletMapTilesPath = 'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=';
+
 
 export const actions = {
 	appLoad: 'appLoad',
-	changeItemsType: 'changeItemsType'
+	changeItemsType: 'changeItemsType',
+	removeFilter: 'removeFilter',
+	addFilter: 'addFilter',
+	removeFilter: 'removeFilter'
 }
 
 export const events = {
@@ -23,9 +30,10 @@ export const events = {
 
 	sidebarStateChange: 'sidebarStateChange',
 	sidebarItemsWillBeSet: 'sidebarItemsWillBeSet',
+	sidebarItemsWillBeAdded: 'sidebarItemsWillBeAdded',
 
 	mapStateChange: 'mapStateChange',
-
+	locationDetailsLoaded: 'locationDetailsLoaded',
 	change: 'change'
 }
 
@@ -36,4 +44,5 @@ export const urls = {
 	actors		: '/api/actors',
 	directors	: '/api/directors',
 	writers		: '/api/writers',
+	locationDetails: 'api/locationDetails'
 }

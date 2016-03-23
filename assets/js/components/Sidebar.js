@@ -35,16 +35,22 @@ export default React.createClass({
   requestItems() {
   	SidebarActions.requestItems(false, this.state.type, {
   						offset: this.state.listItems.length, 
+  						name: this.state.filterValue
   					});
   },
 
   handleFilterChange(value) {
-  	console.log(value);
   	this.setState({filterValue: value});
   	//TODO Debounce
   	SidebarActions.requestItems(true, this.state.type, {
   						name: value
   					});
+  },
+
+  selectFilter(filter) {
+    let message = {};
+    message[this.state.type] = filter;
+    SidebarActions.selectFilter(message);
   },
 
   render: function() {
@@ -65,6 +71,8 @@ export default React.createClass({
     			complete={this.state.complete}
     			requestItems={this.requestItems}
     			loading={this.state.loading}
+          selectFilter={this.selectFilter}
+          filters={this.props.filters}
     			/>
         </div>
     );

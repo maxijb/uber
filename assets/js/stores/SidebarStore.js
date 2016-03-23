@@ -1,12 +1,14 @@
 import {default as pubsub} from '../dispatcher/Dispatcher';
-import {events} from '../constants/Constants';
+import {events, actions} from '../constants/Constants';
 import {EventEmitter} from 'events';
 
 const SidebarStore = Object.assign({}, EventEmitter.prototype, (() => {
 
 	//Default state container
 	let _state = {
-		listItems: []
+		listItems: [],
+		loading: false,
+		complete: false
 	};
 
 	//Setting event Listeners, coming from actions
@@ -36,7 +38,7 @@ const SidebarStore = Object.assign({}, EventEmitter.prototype, (() => {
 	//Export public API
 	return {
 		//Getter to the state
-		getState() { return _state } ,
+		getState() { return _state },
 
 		//Emit the change event for the views
 		emitChange() { 
