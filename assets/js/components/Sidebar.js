@@ -1,6 +1,6 @@
 import {default as React} from 'react';
-import {default as SearchBox} from './SearchBox';
-import {default as SidebarList} from './SidebarList';
+import {default as SearchBox} from './sidebar/SearchBox';
+import {default as SidebarList} from './sidebar/SidebarList';
 
 import {default as SidebarActions} from '../actions/SidebarActions.js';
 import {default as SidebarStore} from '../stores/SidebarStore.js';

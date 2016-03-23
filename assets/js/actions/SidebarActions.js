@@ -1,5 +1,5 @@
 import {default as pubsub} from '../dispatcher/Dispatcher';
-import {actions, events, urls} from '../constants/Constants';
+import {actions, urls} from '../constants/Constants';
 import {queryString} from '../components/helpers/helpers';
 
 var SidebarActions = (function() {
@@ -14,14 +14,14 @@ var SidebarActions = (function() {
  
   function requestItems(setNewItems, type, options) {
     
-    pubsub.emit(setNewItems ? events.sidebarItemsWillBeSet : events.sidebarItemsWillBeAdded);
+    pubsub.emit(setNewItems ? actions.sidebarItemsWillBeSet : actions.sidebarItemsWillBeAdded);
 
     fetch(urls[type] + queryString(options))
     .then((response) => {
      return response.json()
     })
     .then(data => {
-      let event = setNewItems ? events.setSidebarItems : events.addSidebarItems;
+      let event = setNewItems ? actions.setSidebarItems : actions.addSidebarItems;
       pubsub.emit(event, data);
     });
 

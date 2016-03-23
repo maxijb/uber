@@ -6,9 +6,8 @@ export default React.createClass({
   	
 
     return (
-    	<div className="map-icon">
-    		<p>{this.props.lat}</p>
-      </div>
+    	<div className="map-icon icon-location2">
+        </div>
     );
   }
 

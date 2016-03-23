@@ -34,7 +34,7 @@ export default React.createClass({
                  placeholder="Search..."
                  onChange={this.handleFilterChange}
                  />
-  				<span className="icon icon-search" onClick={this.resetFilter}>MAx</span>
+  				<span className="icon icon-cross" onClick={this.resetFilter}></span>
   			</div>
   		</li>
     );

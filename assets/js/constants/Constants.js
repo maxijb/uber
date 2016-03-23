@@ -9,18 +9,17 @@ export const googleResponseDefaultSF = {
 
 export const LeafletImagesPath = '/static/images/';
 export const LeafletMapTilesPath = 'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=';
-
+export const defaultImgPlaceholder = "/static/images/default-placeholder.jpg";
 
 export const actions = {
 	appLoad: 'appLoad',
 	changeItemsType: 'changeItemsType',
 	removeFilter: 'removeFilter',
 	addFilter: 'addFilter',
-	removeFilter: 'removeFilter'
-}
+	removeFilter: 'removeFilter',
+	openHighlight: 'openHighlight',
+	closeHighlight: 'closeHighlight',
 
-export const events = {
-	stateChanged: 'stateChanged',
 	moviesLoaded: 'moviesLoaded',
 	locationsLoaded: 'locationsLoaded',
 	districtsLoaded: 'districtsLoaded',
@@ -32,8 +31,10 @@ export const events = {
 	sidebarItemsWillBeSet: 'sidebarItemsWillBeSet',
 	sidebarItemsWillBeAdded: 'sidebarItemsWillBeAdded',
 
-	mapStateChange: 'mapStateChange',
 	locationDetailsLoaded: 'locationDetailsLoaded',
+}
+
+export const events = {
 	change: 'change'
 }
 

@@ -3,8 +3,8 @@ import {default as ReactDOM} from 'react-dom';
 
 import {events, actions} from '../constants/Constants';
 
-import {default as Actions} from '../actions/UIActions';
-import {default as UIStore} from '../stores/UIStore';
+import {default as MapActions} from '../actions/MapActions';
+import {default as MapStore} from '../stores/MapStore';
 
 import {default as Header} from './Header';
 import {default as Sidebar} from './Sidebar';
@@ -17,10 +17,10 @@ let App = React.createClass({
   
   componentDidMount() {
     //emit that the app has been loaded
-    Actions.appLoad();
+    MapActions.appLoad();
 
     //subscribe to the UIState change and set state accordingly
-    UIStore.on(events.change, this.handleChange);
+    MapStore.on(events.change, this.handleChange);
 
   },  
 
@@ -35,7 +35,15 @@ let App = React.createClass({
   },
 
   handleChange(state) {
-    this.setState(state);
+    this.setState({
+      filters: state.filters, 
+      anyFiltersApplied: state.anyFiltersApplied,
+      highlight: state.highlight
+    });
+  },
+
+  closeHighlight() {
+    MapActions.closeHighlight();
   },
 
   render() {
@@ -45,8 +53,8 @@ let App = React.createClass({
     		<div id="main-container">
     			<Sidebar filters={this.state.filters} />
           <StatusBar filters={this.state.filters} />
-    			<Map districts={this.state.districts} mapLocations={this.state.mapLocations} />
-    			<DetailsBar />
+    			<Map />
+    			<DetailsBar highlight={this.state.highlight} close={this.closeHighlight} />
     		</div>
     	</div>
   	);

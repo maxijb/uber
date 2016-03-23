@@ -2,9 +2,9 @@ import {default as React} from 'react';
 import {events} from '../constants/Constants';
 import {default as MapActions} from '../actions/MapActions.js';
 import {default as MapStore} from '../stores/MapStore.js';
-import {default as UIStore} from '../stores/UIStore.js';
 import {mapboxApiKey, googleResponseDefaultSF as googleSF, LeafletImagesPath, LeafletMapTilesPath} from '../constants/Constants';
 import {MarkerFactory} from './map/MarkerFactory';
+import {closest} from './helpers/helpers';
 //import Leaflet only on the browser
 let L = (typeof window !== "undefined") ? L = require('leaflet') : null;
 
@@ -32,7 +32,7 @@ export default React.createClass({
 
       //Leaflet doesn't listen to clicks on popups
       document.getElementById('map').addEventListener('click', (event) => {
-         if (event.target.matches('.location-popup, .location-popup *')) {
+         if (closest(event.target, '.location-popup')) {
            this.handleLocationPopupClick(event);
          }
       })
@@ -49,11 +49,8 @@ export default React.createClass({
 
   handleMapStateChange(mapState) {
       this.setState(mapState);
-      debugger;
-      if (mapState.lastDetails && this.markers[mapState.lastDetails.id]) {
-         this.markers[mapState.lastDetails.id].addPopupProperties(mapState.lastDetails);
-      }
       this.updateMarkers();
+      this.updateOpenMarkerPopup(mapState.lastDetails);
   },
 
   shouldComponentUpdate: function(nextProps, nextState) {
@@ -63,13 +60,24 @@ export default React.createClass({
 
 
   handleMoveMap() {
-    if (this.map.getZoom() >= 14 && !UIStore.anyFiltersApplied()) {
+    if (this.map.getZoom() >= 14 && !this.state.anyFiltersApplied) {
       MapActions.requestLocations({coordinates: this.map.getBounds().toBBoxString()})
     }
   },
 
+  updateOpenMarkerPopup(details) {
+    //Update last marker popup
+    if (details && this.markers[details.id] && !this.markers[details.id].fullyLoaded) {
+         this.markers[details.id].addPopupProperties(details);
+    }
+  },
+
   updateMarkers() {
+    
+
+    //decide whether to show districts or locations' icons
     let source, type, needUpdate, method;
+    
     if (!this.state.mapLocations.length || (this.state.mapLocations.length >= 100 && this.map.getZoom() < 14)) {
       if (this.state.type !== "district") {
         this.setState({renderedLocations: this.state.districts, type: "district"});
@@ -82,23 +90,24 @@ export default React.createClass({
         this.renderMarkers(this.state.mapLocations, this.handleLocationClick);
       }
     }
+
   },
 
-  handleDistrictPopupClick(district, marker, event) {
-    console.log('popup', district, marker, event);
-  },
 
   handleDistrictClick(district, marker, event) {
     MapActions.selectDistrict({id: district.id, name: district.name});
   },
 
-  handleLocationPopupClick(location, marker, event) {
-    console.log('popup', location, marker, event);
+  handleLocationPopupClick(event) {
+    const trigger = closest(event.target, ".trigger");
+    if (trigger && trigger.dataset) {
+      MapActions.openHighlight(trigger.dataset.highlight, trigger.dataset.id, JSON.parse(trigger.dataset.data));
+    }
   },
 
   handleLocationClick(location, marker, event) {
-    console.log('marker', location, marker, event);
     marker.openPopup();
+    //update marker popup if required
     if (!marker.fullyLoaded) {
       marker.addPopupProperties({showPic: true, loading: true});
       MapActions.requestLocationDetails(location.id);
@@ -127,7 +136,7 @@ export default React.createClass({
 
   	});
 
-    if (UIStore.anyFiltersApplied()) {
+    if (this.state.anyFiltersApplied && pois != this.state.districts) {
       this.map.fitBounds(this.markerLayer.getBounds());
     }
 

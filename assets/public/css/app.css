@@ -52,6 +52,14 @@ header h1 span {
 .district-popup {
   pointer-events: none !important;
 }
+.map-icon.icon-location2 {
+  color: #092278;
+  font-size: 1.6em;
+  text-shadow: 3px 2px 3px rgba(0, 0, 0, 0.5);
+}
+.map-icon.icon-location2:hover {
+  color: #E67817;
+}
 
 #sidebar {
   width: 30%;

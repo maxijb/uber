@@ -39,7 +39,7 @@ export default React.createClass({
     var selectedId = this.props.filters[this.props.type] ? this.props.filters[this.props.type].id : null;
 
     const items = this.props.listItems.map(item => {
-  		if (item) return ( <ListItem key={item.id} item={item} selectFilter={this.props.selectFilter} selected={selectedId == item.id} /> )
+  		if (item) return ( <ListItem key={item.id} type={this.props.type} item={item} selectFilter={this.props.selectFilter} selected={selectedId == item.id} /> )
   	});
 
     return (

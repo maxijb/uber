@@ -13,24 +13,24 @@ const SidebarStore = Object.assign({}, EventEmitter.prototype, (() => {
 
 	//Setting event Listeners, coming from actions
 	pubsub
-		.on(events.addSidebarItems, (response) => {
+		.on(actions.addSidebarItems, (response) => {
 			_state.complete = response.complete;
 			_state.listItems = _state.listItems.concat(response.items);
 			_state.loading = false;
 			SidebarStore.emitChange();
 		})
-		.on(events.setSidebarItems, (response) => {
+		.on(actions.setSidebarItems, (response) => {
 			_state.complete = response.complete;
 			_state.listItems = response.items;
 			_state.loading = false;
 			SidebarStore.emitChange();
 		})
-		.on(events.sidebarItemsWillBeSet, () => {
+		.on(actions.sidebarItemsWillBeSet, () => {
 			_state.listItems = [];
 			_state.loading = "full";
 			SidebarStore.emitChange();
 		})
-		.on(events.sidebarItemsWillBeAdded, () => {
+		.on(actions.sidebarItemsWillBeAdded, () => {
 			_state.loading = "partial";
 			SidebarStore.emitChange();
 		});

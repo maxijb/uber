@@ -48,16 +48,60 @@ import {default as AppComponent} from '../assets/js/components/app';
 
 			let data = dataset.getInstance().locations;
 
-			if (typeof req.query.locations !== "undefined") {
-				data = [data[req.query.locations]];
-			}
+			//coordinate search overrides any other filter
+			if (typeof req.query.coordinates !== "undefined") {
+				//split the coordinates and filter lat/;ng
+				let coordinates = req.query.coordinates.split(',').map(Number);
+				data = data.filter(item => {
+					return item && item.lat && 
+						   item.lng > coordinates[0] && item.lng < coordinates[2] && 
+						   item.lat > coordinates[1] && item.lat < coordinates[3];
+				})
+			
+			} else {
 
-			if (typeof req.query.district !== "undefined") {
-				data = data.filter(item => { return item && item.district == req.query.district });
-			}
+				//if specific location has been selected
+				if (typeof req.query.locations !== "undefined") {
+					data = [data[req.query.locations]];
+				}
 
-			if (typeof req.query.movies !== "undefined") {
-				data = data.filter(item => { return item && item.movies.some(movie => movie == req.query.movies ) });
+				//if district has been selected
+				if (typeof req.query.district !== "undefined") {
+					data = data.filter(item => { return item && item.district == req.query.district });
+				}
+
+
+				//Filter by persons or movies
+				let movieSet = new Set(),
+					personsSet = new Set(),
+					movies = dataset.getInstance().movies;
+
+				//check for any persons params, and add that id to the personsSet
+				if (typeof req.query.actors !== "undefined") personsSet.add(Number(req.query.actors));					
+				if (typeof req.query.directors !== "undefined") personsSet.add(Number(req.query.directors));					
+				if (typeof req.query.writers !== "undefined") personsSet.add(Number(req.query.writers));					
+
+				//if some person has been queried, find his movies
+				if (personsSet.size) {
+					movies.forEach((movie) => {
+						if (movie && movie.persons.some(person => personsSet.has(person.id))) {
+							movieSet.add(Number(movie.id)); 
+						}
+					});
+				}
+
+				//Add the desired movie if the param's there
+				if (typeof req.query.movies !== "undefined") {
+					movieSet.add(Number(req.query.movies));
+				}
+
+				//if any movie has been filtered, filter locations by that moviw
+				if (movieSet.size) {
+					data = data.filter(item => { 
+						return item && item.movies.some(movie => movieSet.has(movie)) 
+					});
+				}
+
 			}
 
 			res.send({items: data});
@@ -104,16 +148,16 @@ import {default as AppComponent} from '../assets/js/components/app';
 
 	function limitResponse(data, params) {
 
-		if (params.name) {
+		//filter by name (containing case insensitive string)
+ 		if (params.name) {
 			data = data.filter(item => {
 				return item && 
 				       item.name && 
 				       item.name.toLowerCase().indexOf(params.name.toLowerCase()) !== -1;
-
 			});
 		}
 		
-		//for persons
+		//for persons, filter by type of role
 		if (params.type) {
 			data = data.filter(item => {
 				item && item.type && item.type.some(type => type == params.type)
@@ -121,14 +165,14 @@ import {default as AppComponent} from '../assets/js/components/app';
 		}
 
 
+		//set the offset and limit of the query (fallback to default)
 		const offset = parseInt(params.offset || defaultOffset, 10);
 		const limit  = offset + parseInt((params.limit || defaultLimit), 10);
 		
+		//size of the query before slicing (compared to get complete status later)
 		const fullLength = data.length;
 
 		data = data.slice(offset, limit);
-
-		console.log(fullLength, data.length);
 
 		return {items: data, complete: data.length == fullLength || data.length == 0};
 	}
