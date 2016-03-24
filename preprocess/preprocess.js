@@ -54,7 +54,7 @@ const normalizedData = {
 
 new Promise((resolve, reject) => {
 		//Read the dataset 
-		fs.readFile('../data/sf-dump.json', 'utf-8', (err, data) => {
+		fs.readFile('./data/sf-dump.json', 'utf-8', (err, data) => {
 			!err ? resolve(data) : reject(err);
 		});
 	})
@@ -64,14 +64,14 @@ new Promise((resolve, reject) => {
 	.then(mapLocations)
 	//work with normalized data
 	.then(() => normalizedData)
-	.then(getMoviesData)
 	.then(getLocationData)
+	.then(getMoviesData)
 	//prepare output and save to file
 	.then(formatOutput)
 	.then(data => {
 		//persist to file
 		return new Promise((resolve, reject) => {
-			fs.writeFile('../data/data-preprocessed.json', JSON.stringify(data), function(err) {
+			fs.writeFile('./data/data-preprocessed.json', JSON.stringify(data), function(err) {
 				!err ? resolve(data) : reject(err);
 			});
 		});
@@ -122,6 +122,7 @@ function mapPersons(movie_id, ...people) {
 	//cache normalized data container
 	let persons = normalizedData.persons;
 
+
 	//we are going to split composed filed like "john & rick" to be two different persons
 	let members = [];
 
@@ -136,13 +137,16 @@ function mapPersons(movie_id, ...people) {
 		let names = name.replace(/,/g, '&').split('&');
 		//add all those names and roles to the array
 		names.forEach(member => {
-			members.push({member, type});	
+			if (member) {
+				member = member.trim();
+				members.push({member, type});	
+			}
 		})
 	}); 
 
 	//now walk the array storing normalized names
 	//the roles will be kept in a Set to avoid repetitions
-	return members.map((name, i) => {
+	let result = members.map((name, i) => {
 		
 		if (!persons.hasOwnProperty(name.member)) {
 			persons[name.member] = {
@@ -159,12 +163,17 @@ function mapPersons(movie_id, ...people) {
 
 		//this persons array will be stores on movies object as a reference (one to many)
 		return {
-			id: normalizedData.personsIndex, 
+			id: persons[name.member].id, 
 			type: name.type
 		}; 
 
 	//remove empty references	
 	}).filter(x => x !== null);
+
+	if (movie_id == 18) {
+		console.log(result);
+	}
+	return result;
 }
 
 
@@ -370,10 +379,12 @@ function getLocationData(data) {
 
 					//it hasn't found a good match, or it's returning the default response for SF city
 					//so we ignore this location
-					if (!bestResponse.place_id || bestResponse.place_id == googleResponseDefaultSF.place_id) {
-						console.log("FAILS ", location);
-						return {};
-					}
+					// This approach was leaving many movies without markers, so we'll keep
+					//default responses forthe sake of the demo's best behaviour
+					// if (!bestResponse.place_id || bestResponse.place_id == googleResponseDefaultSF.place_id) {
+					// 	console.log("FAILS ", location);
+					// 	return {};
+					// }
 					
 					//has found a good response!
 					return bestResponse;
