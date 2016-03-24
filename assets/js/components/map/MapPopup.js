@@ -1,8 +1,18 @@
+/* Renders the popup for locations markers */
+
 import {default as React} from 'react';
 import {default as GoogleSVPoster} from '../helpers/GoogleSVPoster';
 
 export default React.createClass({
 
+  propTypes: {
+  	movieDetails: React.PropTypes.array,
+  	lat: React.PropTypes.number,
+  	lng: React.PropTypes.number,
+  	showPic: React.PropTypes.bool
+  },
+
+  //Start with and empty list of films
   getDefaultProps() {
   	return {
   		movieDetails: []
@@ -10,7 +20,8 @@ export default React.createClass({
   },
 
   render: function() {
-  	
+
+  	//render array of movie details
   	const movies = this.props.movieDetails.map(movie => {
   		return (
   			<a key={movie.id} className="trigger movies" data-highlight="movies" data-id={movie.id} data-data={JSON.stringify(movie)}>{movie.name}</a>
@@ -44,5 +55,4 @@ export default React.createClass({
         </div>
     );
   }
-
 });

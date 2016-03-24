@@ -3,8 +3,6 @@ import {default as ImdbPoster} from './helpers/ImdbPoster';
 
 export default React.createClass({
 
-
-
   renderMovie(props) {
 
   	console.log(this.props);

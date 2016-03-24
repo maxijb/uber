@@ -1,12 +1,19 @@
+/* Special list item for movies */
+
 import {default as React} from 'react';
 import {default as ImdbPoster} from '../helpers/ImdbPoster';
 
 export default React.createClass({
+  
+  propTypes: {
+    item: React.PropTypes.object
+  },
 
   render: function() {
-  	
+  	//cache props
     const item = this.props.item;
-    //console.log(item.imdbRating);
+
+    //render rating if available
     const rating = item && !isNaN(item.imdbRating) ? 
                       Array.apply(null, Array(Math.round(item.imdbRating/2))).map((x,i) => { 
                         return ( <span key={i} className="icon-star-full"></span> )

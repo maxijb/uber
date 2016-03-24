@@ -1,7 +1,17 @@
+/* Each of the options on the searchbox to filter by type and name */
+
 import {default as React} from 'react';
 import {default as classes} from 'classnames';
 
 export default React.createClass({
+
+  propTypes: {
+    selected: React.PropTypes.bool,
+    filterValue: React.PropTypes.string,
+    type: React.PropTypes.string,
+    handleClick: React.PropTypes.func.isRequired,
+    handleFilterChange: React.PropTypes.func.isRequired
+  },
 
   getInitialState() {
     return {
@@ -9,11 +19,16 @@ export default React.createClass({
     }
   },
   
+  /* Reset filter field to search by name 
+    @param event DOMEvent */
   resetFilter(event) {
     event.stopPropagation();
     this.props.handleFilterChange("");
   },
 
+  /* The name filter has changed its value 
+  @param event DomEvent
+  */
   handleFilterChange(event) {
     this.props.handleFilterChange(event.target.value);
   },

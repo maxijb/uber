@@ -15,7 +15,41 @@ header {
 		padding-top: 10px;
 
 		> a {
-			margin-left: 15px; 
+			margin-left: 15px;
+			position: relative; 
+			cursor: pointer;
+
+			.popup {
+				display: none;
+			    position: absolute;
+			    right: -10px;
+			    background: rgba(0, 0, 0, 0.7);
+			    color: white;
+			    max-width: 300px;
+			    text-align: center;
+			    width: 300px;
+			    padding: 10px;
+			    border-radius: 5px;
+			    top: 27px;
+			    font-size: 0.9em;
+			    border: 1px solid black;
+
+			    &:after {
+			    	content: '';
+			    	border-bottom: 10px solid black;
+			    	border-left: 10px solid transparent;
+			    	border-right: 10px solid transparent;
+			    	position: absolute;
+			    	bottom: 100%;
+			    	right: 15px;
+			    }
+			}
+
+			&:hover {
+				.popup {
+					display: block
+				}
+			}
 		}
 	}
 

@@ -1,9 +1,18 @@
+/* Renders the searchbox to select type of list items and filter them by name */
+
 import {default as React} from 'react';
 import {default as SearchBoxOption} from './SearchBoxOption';
 
 export default React.createClass({
 
-  
+  propTypes: {
+    changeType: React.PropTypes.func.isRequired,
+    handleFilterChange: React.PropTypes.func.isRequired,
+    filterValue: React.PropTypes.string,
+    type: React.PropTypes.string
+  },
+
+  //initial state constins type of objects and "closed" state
   getInitialState() {
     return {
       open: false,
@@ -11,6 +20,8 @@ export default React.createClass({
     }
   },
 
+  //OPen the searchbox
+  //@param e (event)
   toggleOpen(e) {
     if (e.target.tagName !== "INPUT") {
       var isOpen = this.state.open;
@@ -18,6 +29,8 @@ export default React.createClass({
     }
   },
 
+  //Callback when one options has been clicked
+  //@param type (string) type of objects required
   handleOptionClick(type) {
     if (this.state.open) {
       this.props.changeType(type);

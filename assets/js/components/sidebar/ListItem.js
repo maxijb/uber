@@ -1,6 +1,5 @@
 import {default as React} from 'react';
 import {default as MovieListItem} from './MovieListItem';
-import {default as LocationListItem} from './LocationListItem';
 import {default as PlainListItem} from './PlainListItem';
 
 export default React.createClass({
@@ -23,8 +22,7 @@ export default React.createClass({
         {(() => {
           switch (this.props.type) {
             case "movies":   return ( <MovieListItem item={item} /> ); break;
-            case "locations": return ( <LocationListItem item={item} /> ); break;
-            default:         return ( <MovieListItem item={item} /> ); break;
+            default:         return ( <PlainListItem item={item} /> ); break;
           }
         })()}
 

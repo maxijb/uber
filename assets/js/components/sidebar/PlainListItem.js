@@ -1,6 +1,12 @@
+/* List item content plain markup*/
+
 import {default as React} from 'react';
 
 export default React.createClass({
+  
+  propTypes: {
+    item: React.PropTypes.object
+  },
 
   render: function() {
   	

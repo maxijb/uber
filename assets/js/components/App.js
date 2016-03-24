@@ -1,3 +1,9 @@
+/* Main application component at the root of the react tree 
+  It's rendered both server and client side.
+  When on the client, we need to check for 'window' and start the react element 
+  on the '#react-root' div
+*/
+
 import {default as React} from 'react';
 import {default as ReactDOM} from 'react-dom';
 
@@ -34,6 +40,9 @@ let App = React.createClass({
     }
   },
 
+
+  //Update the state when mapStore changes
+  //@param state is the store's state
   handleChange(state) {
     this.setState({
       filters: state.filters, 
@@ -42,6 +51,7 @@ let App = React.createClass({
     });
   },
 
+  //Action to close the highlightd window
   closeHighlight() {
     MapActions.closeHighlight();
   },
@@ -63,7 +73,7 @@ let App = React.createClass({
 
 export default App;
 
-//Start in the browser
+//Start the app in the browser
 if (typeof window !== "undefined") {
   ReactDOM.render(React.createElement(App, {}), document.getElementById('react-root'));
 }

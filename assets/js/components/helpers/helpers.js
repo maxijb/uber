@@ -1,21 +1,25 @@
 import {default as ReactDOMServer} from 'react-dom/server';
 import {default as React} from 'react';
 
+
+/* 
+	Renders static html from a reactClass and properties.
+	It's used inside of leaflet where we need to interact wit the dom directly
+	@param reactClass
+	@param props
+
+	@return HTML string
+*/
 export const reactRender = (reactClass, props) => {
 	return ReactDOMServer.renderToStaticMarkup(React.createElement(reactClass, props));
 }
 
 
-
-// export function debounce(fn, time) => {
-// 	let timeout = null;
-
-// 	return () => {
-// 		fn.apply(this)
-// 	}
-// }
-
-
+/* Receives an object and serializes it, removing empty keys
+   and encoding it for query string
+	@param obj (object)
+	@return string formatted like '?cdjncd=cdjncd&uh=90'
+*/
 export const queryString = (obj) => {
     var str = [];
     for(var p in obj)
@@ -27,8 +31,14 @@ export const queryString = (obj) => {
   }
 
 
+
+/* Find the closest element (moving upwards) in the dom matching our desired selector
+	@param el (DomNode)
+	@param selector (string -> css selector)
+	@return null | found DomNode
+*/
 export const closest = (el, selector) => {
-    var matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
+    let matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
 
     while (el) {
         if (matchesSelector.call(el, selector)) {

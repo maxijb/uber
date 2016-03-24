@@ -1,19 +1,23 @@
+/* List containing all the list items.
+   Implements infinite scrolling, as every time the user scrolls more than 80% of the offset height,
+   it will require more items.
+   */
+
 import {default as React} from 'react';
 import {default as ListItem} from './ListItem';
 
 export default React.createClass({
 
-  componentDidMount() {
-    //we want to implement infinite scrolling
-    //TODO: debounce
-    this.node = document.getElementById('sidebar-list');
-    this.node.addEventListener('scroll', this.handleScroll)
-  },
-
   getDefaultProps() {
     return {
       listItems: []
     }
+  },
+
+  componentDidMount() {
+    //we want to implement infinite scrolling
+    this.node = document.getElementById('sidebar-list');
+    this.node.addEventListener('scroll', this.handleScroll)
   },
 
   //remove listeners from the dom, when unmounting

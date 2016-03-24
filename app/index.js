@@ -1,3 +1,7 @@
+/* Main file of our backend app.
+   Sets the server, the routes, start the dataset
+*/
+
 import {default as express} from 'express';
 import {default as React} from 'react';
 import {default as ReactDOMServer} from 'react-dom/server';
@@ -17,8 +21,12 @@ import {default as AppComponent} from '../assets/js/components/App';
 
 /* -------------- Server routes ------------- */
 
-	function startServer(dataset) {
-		
+	function startServer(datasetSingleton) {
+
+		//Get a reference to the dataset
+		const dataset = datasetSingleton.getInstance();
+
+		//Set static assets path
 		app.use('/static', express.static(__dirname + '/../assets/public'));
 
 
@@ -30,23 +38,37 @@ import {default as AppComponent} from '../assets/js/components/App';
 		});
 		
 
+		
 
+		// Map details for that locations
+		// @param id (queryString) Number
 		app.get('/api/locationDetails', function(req, res) {
-			let movies = dataset.getInstance().movies;
-			let location = Object.assign({}, dataset.getInstance().locations[req.query.id]);
+			let movies = dataset.movies;
+			//get the location object
+			let location = Object.assign({}, dataset.locations[req.query.id]);
+
+			//and plug in information about every movie filmed there
 			location.movieDetails = location.movies.map((movie_id) => {
 				return movies[movie_id];
 			});
 
+			//return bundled details
 			res.send({details: location});
-
 
 		});
 
 
+
+		//Get locations' information to create map markers
+		// All params are optional, as they are different kinds of filters that can be applied
+		// All come by query string
+		// @param coordinates (serialized array / by commas)
+		// @param [actors|directors|writers] (id_number) filter by person within a movie
+		// @param movie (id_number) filter by movie
+		// @param district (id_number) filter by district
 		app.get('/api/locations', function(req, res) {
 
-			let data = dataset.getInstance().locations;
+			let data = dataset.locations;
 
 			//coordinate search overrides any other filter
 			if (typeof req.query.coordinates !== "undefined") {
@@ -74,7 +96,7 @@ import {default as AppComponent} from '../assets/js/components/App';
 				//Filter by persons or movies
 				let movieSet = new Set(),
 					personsSet = new Set(),
-					movies = dataset.getInstance().movies;
+					movies = dataset.movies;
 
 				//check for any persons params, and add that id to the personsSet
 				if (typeof req.query.actors !== "undefined") personsSet.add(Number(req.query.actors));					
@@ -95,7 +117,7 @@ import {default as AppComponent} from '../assets/js/components/App';
 					movieSet.add(Number(req.query.movies));
 				}
 
-				//if any movie has been filtered, filter locations by that moviw
+				//if any movie has been filtered, filter locations by that movie
 				if (movieSet.size) {
 					data = data.filter(item => { 
 						return item && item.movies.some(movie => movieSet.has(movie)) 
@@ -105,10 +127,16 @@ import {default as AppComponent} from '../assets/js/components/App';
 			}
 
 			res.send({items: data});
-		})
+		});
 
 		
-	    // JSON API to fetch different kinds of data
+
+
+	    // JSON API to fetch different kinds of data. 
+	    // Data is used to create sidebar items
+	    // @param resource [writers|directors|districts|actors] (mandatory) type of resource
+	    // @param name (optional string) filter by name "containing string"
+	    // @param type (optional string) filterby role, in case of persons, like 'actors'
 		app.get('/api/:resource', function(req, res){
 
 			let resource, 
@@ -123,7 +151,7 @@ import {default as AppComponent} from '../assets/js/components/App';
 				params = req.query;
 			}
 
-			if (datasource = dataset.getInstance()[resource]) {
+			if (datasource = dataset[resource]) {
 				res.send(limitResponse(datasource, req.query));
 			} else {
 				res.status(404).send('Not found');
@@ -132,10 +160,11 @@ import {default as AppComponent} from '../assets/js/components/App';
 		});
 
 		
-		//Start server
+
+		// Start server and receive requests
 		app.listen(process.env.PORT || 5000, function() {
-		  console.log('Listening on port 3000...')
-		})
+		  console.log('Listening on port 5000...')
+		});
 
 	}
 
@@ -146,6 +175,16 @@ import {default as AppComponent} from '../assets/js/components/App';
 	const defaultOffset = 0;
 	const defaultLimit  = 30;
 
+
+	/* Limits the resonse to api/[resource] requests.
+	   Filters by the desired criteria and offset/limits accordingly
+	   @param data (object) == dataset[resource]
+	   @param params (object) == req.query 
+	   		-> may contain 
+	   			-> limit, offset
+	   			-> name (to filter)
+	   			-> type (to filter by role of person in the movie)
+	  */
 	function limitResponse(data, params) {
 
 		//filter by name (containing case insensitive string)
@@ -163,7 +202,6 @@ import {default as AppComponent} from '../assets/js/components/App';
 				item && item.type && item.type.some(type => type == params.type)
 			});
 		}
-
 
 		//set the offset and limit of the query (fallback to default)
 		const offset = parseInt(params.offset || defaultOffset, 10);
