@@ -540,8 +540,10 @@ exports.default = _react2.default.createClass({
     this.map.setView([_Constants.googleResponseDefaultSF.lat, _Constants.googleResponseDefaultSF.lng], _Constants.googleResponseDefaultSF.zoom).on('zoomend', this.updateMarkers).on('moveend', this.handleMoveMap);
 
     //Easiest way to listen to clicks on Leaflet popups
-    document.getElementById('map').addEventListener('click', function (event) {
+    document.addEventListener('click', function (event) {
+      console.log('click happen');
       if ((0, _helpers.closest)(event.target, '.location-popup')) {
+        console.log('clfirst closets');
         _this.handleLocationPopupClick(event);
       }
     });
