@@ -45,7 +45,7 @@ export default React.createClass({
           console.log('clfirst closets');
            this.handleLocationPopupClick(event);
          }
-      })
+      }, true);
   },
 
   //empty locations

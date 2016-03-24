@@ -546,7 +546,7 @@ exports.default = _react2.default.createClass({
         console.log('clfirst closets');
         _this.handleLocationPopupClick(event);
       }
-    });
+    }, true);
   },
 
 
