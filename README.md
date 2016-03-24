@@ -37,16 +37,16 @@ So, we had to identify patters, and test three variants in this case:
 
 
 **Architecture**   
-Due to the small size of the dataset, I decided not to use a database and keep the data in memory in the Express application. This gave me the excuse also, to do filtering by myself with functional programing techniques.
+Due to the small size of the dataset, I decided not to use a database and keep the data in memory in the Express application. This also gave me the excuse, to do some filtering by myself with functional programing techniques.
 
-On the frontend, however, the way we treat information, is like we would with a much bigger dataset. The only data we're caching on the frontend is the one for districts, wich is only an array of 60 elements. All the rest is lazy loaded, when required.
+On the frontend, however, the way we treat information, is like we would with a much bigger dataset. The only data we're caching on the frontend is the one for districts, wich is only an array of 60 elements. All the rest is lazy loaded when required.
 
 The flow of the data in the frontend uses a "flux-like" approach. As the views are rendered by React, these call actions on the action creators. These "action creators" are encharged of communicating with the server and trigger actions which modify the stated of the "stores".   
-Between actions and stores, the dispatcher sends events, to whichever store wants to listen. For the scope of this app, we didn't need all the overhead of the Facebook's dispatcher, and ended up using Node's standard Pub/Sub module.    
+Between actions and stores, the dispatcher publishes the events. For the scope of this app, we didn't need all the overhead of the Facebook's dispatcher, and ended up using Node's standard Pub/Sub module.    
 
 As the app has two big regions, with mostly separated scopes (the sidebar and the map) it made sense to create analogue stores and action creator for these two regions.
 
-However, as one map library was needed, I included Leaflet, for it's ability to allow html and css styling in its overlays. Leaflet modifies the dom without interacting with React, so we had to handle this situation accordingly. In some cases, to create popups we render React markup to a text representation, and then inject that html into the leaflet components.
+However, as one map library was needed, I included Leaflet, for it's ability to allow html and css styling in its overlays. Leaflet modifies the dom without interacting with React, so we had to handle this situation accordingly. In some cases, (as when we create the map popups) we render React markup to a text representation, and then inject that html into the leaflet component.
 
 
 **UX / Interactions:**  
