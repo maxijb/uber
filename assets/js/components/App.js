@@ -17,7 +17,7 @@ import Sidebar from './Sidebar';
 import Map from'./Map';
 import DetailsBar from './DetailsBar';
 import StatusBar from './StatusBar';
-
+import {default as fetchPolifyl} from 'whatwg-fetch';
 
 let App = React.createClass({
   
