@@ -40,7 +40,9 @@ export default React.createClass({
 
       //Easiest way to listen to clicks on Leaflet popups
       document.getElementById('map').addEventListener('click', (event) => {
+         console.log('click happen');
          if (closest(event.target, '.location-popup')) {
+          console.log('clfirst closets');
            this.handleLocationPopupClick(event);
          }
       })
