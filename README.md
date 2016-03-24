@@ -11,6 +11,11 @@ $ git clone [this Repo]
 $ npm install
 $ npm start
 ```
+Usually this is all it takes, since I've committed the bundled JS and CSS, and the preprocessed data. Otherwise we would also need these commands before starting:
+```
+$ node preprocess.js
+$ grunt build
+```
 
 **Tech stack:** 
 - Both the frontend and the backend are written on ES6, and transpiled with Babel. 
@@ -34,6 +39,7 @@ So, we had to identify patters, and test three variants in this case:
      *Epic Roasthouse, San Francisco*   
      *399 Embarcadero, San Francisco*   
 - Once we get the results for the three variants, we check each level of accuracy of each, and pick the best response.
+- The preprocess is done in two steps, since Google and Imdb are very sensitive about number of requests, and we need to treat their data as an appreciated resource. 
 
 
 **Architecture**   
