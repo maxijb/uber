@@ -6,9 +6,13 @@ const request 	= require('request-promise');
 
 /* ---------------- Start Preprocessing ---------------- */
 
-new Promise((resolve, reject) => {
+
+
+const mainFlow = () => {
+
+	return new Promise((resolve, reject) => {
 		//Read the dataset 
-		fs.readFile('../data/data-preprocessed.json', 'utf-8', (err, data) => {
+		fs.readFile('./data/data-preprocessed.json', 'utf-8', (err, data) => {
 			!err ? resolve(data) : reject(err);
 		});
 	})
@@ -20,14 +24,15 @@ new Promise((resolve, reject) => {
 	.then(data => {
 		//persist to file
 		return new Promise((resolve, reject) => {
-			fs.writeFile('../data/data.json', JSON.stringify(data), function(err) {
+			fs.writeFile('./data/data.json', JSON.stringify(data), function(err) {
 				!err ? resolve(data) : reject(err);
 			});
 		});
 	})
 	.catch(e => console.error(e));
+}
 
-
+module.exports = mainFlow;
 
 
 /* ---------------- Transformations to be applied over the dataset ---------------- */
@@ -37,6 +42,9 @@ new Promise((resolve, reject) => {
    @return raw data
 */
 function mapDistricts(data) {
+
+	console.log("Mapping ditricts");
+
 	//cache data container
 	let locations = data.locations;
 	let districts = {},

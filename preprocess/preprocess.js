@@ -3,6 +3,7 @@
 const fs 		= require('fs');
 const request 	= require('request-promise');
 const async 	= require('async');
+const postprocess = require('./postprocess');
 
 /* ---------------- Config APIS ---------------- */
 
@@ -76,6 +77,9 @@ new Promise((resolve, reject) => {
 			});
 		});
 	})
+	//call the postprocessig process to map districts, and format the output
+	//to make it 'production-ready'
+	.then(postprocess)
 	.catch(e => console.error(e));
 
 
@@ -88,6 +92,9 @@ new Promise((resolve, reject) => {
    @return raw data
 */
 function mapMovies(data) {
+
+	console.log("Mapping movies");
+	
 	//cache data container
 	let movies = normalizedData.movies;
 
@@ -170,9 +177,7 @@ function mapPersons(movie_id, ...people) {
 	//remove empty references	
 	}).filter(x => x !== null);
 
-	if (movie_id == 18) {
-		console.log(result);
-	}
+	
 	return result;
 }
 
@@ -182,6 +187,9 @@ function mapPersons(movie_id, ...people) {
  	@return the same data to fullfil promise
  */
 function mapLocations(data) {
+	
+	console.log("Mapping locations");
+	
 	let locations = normalizedData.locations;
 
 	//walk the data
@@ -379,12 +387,10 @@ function getLocationData(data) {
 
 					//it hasn't found a good match, or it's returning the default response for SF city
 					//so we ignore this location
-					// This approach was leaving many movies without markers, so we'll keep
-					//default responses forthe sake of the demo's best behaviour
-					// if (!bestResponse.place_id || bestResponse.place_id == googleResponseDefaultSF.place_id) {
-					// 	console.log("FAILS ", location);
-					// 	return {};
-					// }
+					 if (!bestResponse.place_id || bestResponse.place_id == googleResponseDefaultSF.place_id) {
+					 	console.log("FAILS ", location);
+					 	return {};
+					 }
 					
 					//has found a good response!
 					return bestResponse;
