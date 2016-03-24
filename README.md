@@ -18,6 +18,7 @@ $ npm start
 - The map is rendered by Leaftlet, and the styling is done with LessCSS.
 - The backend is a NodeJS application, powered by Express.
 - The persistence layer uses a single JSON file
+- The static assets are being handled by Grunt. And all the JS modules are being bundled by browserify.
 - Tested on IE 9+, Chrome, FF
 
 
@@ -54,6 +55,14 @@ That's why we allow to do filtering by name of the movie, actors, location and d
 
 Every interaction refreshes the marker on the map. If not filters have been applied and the zoom is not big enough, we render the marker for every district, rather than the individual locations markers. This way we can visualizae the areas fo the city were most movies have been filmed.
 If the user wants more information about a location or a movie, he can click either on the sidebar's items, or the locations popups, and will get a new section coming from the bottom of the page with a Street View block, or the details about the selected movie.
+
+
+**What could be improved**
+- Sometimes google and Imdb are not so happy about me hotlinking their resources and they return a 403. It's ok guys, I know it's not personal :)  However, the app looks so much better when the images load... 
+- For the sake of simplicity, I printed English texts, where we usually would include variables that could be easily internationalized. 
+- The JS and CSS bundles are only one, when tipycally I would create one bundle for the app, and another for libraries  (which change less frequently). That way we could take more advantage of the browser's cache. 
+
+- Of course, we are lacking tests. 
 
 
 I hope you enjoy it, guys! I had a lot of fun coding it...
