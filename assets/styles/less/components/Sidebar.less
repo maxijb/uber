@@ -6,4 +6,36 @@
 	bottom: 0;
 	position: absolute;
 	min-width: 250px;
+	
+
+	&.loading-full {
+		#sidebar-list {
+			opacity: 0.6;
+		}
+	}
+
+
+	.loading {
+		position: absolute;
+			height: 30px;
+			bottom: -40px;
+			left: 0;
+			right: 0;
+			background: -moz-linear-gradient(top,  rgba(186,186,186,0) 0%, rgba(188,188,188,0.82) 100%); /* FF3.6-15 */
+			background: -webkit-linear-gradient(top,  rgba(186,186,186,0) 0%,rgba(188,188,188,0.82) 100%); /* Chrome10-25,Safari5.1-6 */
+			background: linear-gradient(to bottom,  rgba(186,186,186,0) 0%,rgba(188,188,188,0.82) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00bababa', endColorstr='#d1bcbcbc',GradientType=0 ); /* IE6-9 */
+			text-align: center;
+			-webkit-transition: top 1s ease;
+		  -moz-transition: top 1s ease;
+		  -o-transition: top 1s ease;
+		  -ms-transition: top 1s ease;
+		  transition: top 1s ease;
+	}
+
+	&.loading-partial, &.loading-full {
+		> .loading {
+			bottom: 0;
+		}
+	}
 }

@@ -6,6 +6,7 @@ import React from 'react';
 import SearchBox from './sidebar/SearchBox';
 import SidebarList from './sidebar/SidebarList';
 import SidebarActions from '../actions/SidebarActions.js';
+import MapActions from '../actions/MapActions.js';
 import SidebarStore from '../stores/SidebarStore.js';
 import {events} from '../constants/Constants';
 
@@ -69,9 +70,18 @@ export default React.createClass({
     SidebarActions.selectFilter(message);
   },
 
+  //Clicks on the "open highlight" or see more button
+  //@parma type [location|movie]
+  //@parm id (number)
+  //@param data (object)
+  handleViewMoreClick(type, id, data) {
+    console.log(arguments);
+    MapActions.openHighlight(type, id, data);
+  },
+
   render: function() {
     return (
-    	<div id="sidebar" className={this.state.loading ? "loading"+this.state.loading : "" }>
+    	<div id="sidebar" className={this.state.loading ? "loading-"+this.state.loading : "" }>
     		<SearchBox 
     			type={this.state.type} 
     			changeType={this.changeType} 
@@ -89,7 +99,11 @@ export default React.createClass({
     			loading={this.state.loading}
           selectFilter={this.selectFilter}
           filters={this.props.filters}
+          handleViewMoreClick={this.handleViewMoreClick}
     			/>
+          <span className="loading">
+            <img src='/static/images/facebook2.gif' />
+          </span>
         </div>
     );
   }

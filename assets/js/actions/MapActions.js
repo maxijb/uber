@@ -10,24 +10,20 @@ var MapActions = (function() {
   };
   
   const requestDistricts = () => {
-    
-    pubsub.emit(actions.locationsWillBeLoaded);
 
-    fetch(urls.districts + "?limit=5000")
-    .then((response) => {
-     return response.json()
-    })
-    .then(data => {
-      pubsub.emit(actions.districtsLoaded, data);
-    });
+      fetch(urls.districts + "?limit=5000")
+      .then((response) => {
+       return response.json()
+      })
+      .then(data => {
+        pubsub.emit(actions.districtsLoaded, data);
+      });
 
   };
 
 
   const requestLocations = (options) => {
     
-    pubsub.emit(actions.locationsWillBeLoaded);
-
     fetch(urls.locations + queryString(Object.assign({}, options, {limit: 100})))
     .then((response) => {
      return response.json()
@@ -40,6 +36,7 @@ var MapActions = (function() {
 
 
   const selectDistrict = (district) => {
+    pubsub.emit(actions.locationsWillBeLoaded);
     pubsub.emit(actions.addFilter, {district});
   }
 
@@ -49,6 +46,8 @@ var MapActions = (function() {
   
 
   const requestLocationDetails = (location) => {
+    pubsub.emit(actions.locationsWillBeLoaded);
+
     fetch(urls.locationDetails + queryString({id: location}))
     .then((response) => {
      return response.json()

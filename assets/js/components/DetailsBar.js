@@ -12,6 +12,47 @@ export default React.createClass({
 		highlight: React.PropTypes.object
 	},
 
+
+ 
+
+  componentWillUpdate(nextProps, nextState) {
+    if (nextProps.highlight) {
+
+      if (nextProps.highlight.type == "location" && nextProps.highlight != this.props.highlight) {
+        this.shouldRenderSV = true;   
+      } else if (!nextProps.highlight.type !== "location") {
+        this.panorama = null;
+      }
+    }
+  },
+
+  componentDidUpdate() {
+    if (this.shouldRenderSV) {
+      this.shouldRenderSV = false;
+      this.panorama = new google.maps.StreetViewPanorama(
+        document.getElementById('street-view'),
+        {
+          position: {lat: this.props.highlight.data.lat, lng: this.props.highlight.data.lng},
+          pov: {heading: 165, pitch: 0},
+          zoom: 1
+        });
+    }
+  },
+
+    //Sub render method to render location's street view 
+  //@param props (ojbect) data about the location
+   renderLocation(props) {
+    return (
+      <div className='details-bar-content'>
+        <div id='street-view'>
+        </div>
+        <div className='details-bar-sidebar'>
+          <p className='title'>{props.name}</p>
+        </div>
+      </div>
+    )
+  },
+
   //Sub render method to render movies information
   //@param props (ojbect) data about the movie
   renderMovie(props) {
@@ -52,14 +93,14 @@ export default React.createClass({
 
 
   render: function() {
-
+    
     return (
     	<div id="details-bar" className={this.props.highlight ? "visible " + this.props.highlight.type  : ""}>
     		<a className="details-bar-close icon icon-cross" onClick={this.props.close}></a>
 
     			{(() => {
     				if (this.props.highlight)
-    				return this.props.highlight == "location" ? this.renderLocation(this.props) : this.renderMovie(this.props.highlight.data);
+    				return this.props.highlight.type == "location" ? this.renderLocation(this.props.highlight.data) : this.renderMovie(this.props.highlight.data);
     			})()}
         </div>
     );

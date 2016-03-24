@@ -60,7 +60,7 @@ let App = React.createClass({
   render() {
     return (
     	<div id="main-app">
-    		<Header/>
+    		<Header loading={this.state.loading}/>
     		<div id="main-container">
     			<Sidebar filters={this.state.filters} />
           <StatusBar filters={this.state.filters} />

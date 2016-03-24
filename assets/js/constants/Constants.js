@@ -38,6 +38,7 @@ export const actions = {
 	sidebarItemsWillBeAdded: 'sidebarItemsWillBeAdded',
 
 	locationDetailsLoaded: 'locationDetailsLoaded',
+	locationsWillBeLoaded: 'locationsWillBeLoaded'
 }
 
 export const events = {

@@ -21,6 +21,10 @@
 
 .district-popup {
 	pointer-events: none !important;
+	text-align: center;
+	p {
+		margin: 0;
+	}
 }
 
 .map-icon.icon-location2 {
@@ -40,6 +44,10 @@
 
 .map-popup {
 	text-align: center;
+
+	img {
+		cursor: pointer;
+	}
 	
 	p.name {
 		font-weight: bold;
@@ -50,18 +58,27 @@
 	.movies-header {
 		    color: @accent;
 		    margin: 0;
-		    border: 1px @accent solid;
 		    padding: 2px 0;
 		    border-radius: 6px;
 		    margin-bottom: 3px;
 	}
 
 	.trigger.movies {
+		
+		border: 1px @accent solid;
 		display: block;
 		cursor: pointer;
 		display: block;
     	font-weight: bold;
     	color: @secondary;
+    	border-radius: 2px;
+    	margin-bottom: 2px;
+    	padding: 1px 4px;
+
+    	&:hover {
+    		background: @secondary;
+    		color: white;
+    	}
 
 	}
 }

@@ -27,8 +27,6 @@ var MapActions = function () {
 
   var requestDistricts = function requestDistricts() {
 
-    _Dispatcher2.default.emit(_Constants.actions.locationsWillBeLoaded);
-
     fetch(_Constants.urls.districts + "?limit=5000").then(function (response) {
       return response.json();
     }).then(function (data) {
@@ -38,8 +36,6 @@ var MapActions = function () {
 
   var requestLocations = function requestLocations(options) {
 
-    _Dispatcher2.default.emit(_Constants.actions.locationsWillBeLoaded);
-
     fetch(_Constants.urls.locations + (0, _helpers.queryString)((0, _assign2.default)({}, options, { limit: 100 }))).then(function (response) {
       return response.json();
     }).then(function (data) {
@@ -48,6 +44,7 @@ var MapActions = function () {
   };
 
   var selectDistrict = function selectDistrict(district) {
+    _Dispatcher2.default.emit(_Constants.actions.locationsWillBeLoaded);
     _Dispatcher2.default.emit(_Constants.actions.addFilter, { district: district });
   };
 
@@ -56,6 +53,8 @@ var MapActions = function () {
   };
 
   var requestLocationDetails = function requestLocationDetails(location) {
+    _Dispatcher2.default.emit(_Constants.actions.locationsWillBeLoaded);
+
     fetch(_Constants.urls.locationDetails + (0, _helpers.queryString)({ id: location })).then(function (response) {
       return response.json();
     }).then(function (data) {
@@ -250,7 +249,7 @@ var App = _react2.default.createClass({
     return _react2.default.createElement(
       'div',
       { id: 'main-app' },
-      _react2.default.createElement(_Header2.default, null),
+      _react2.default.createElement(_Header2.default, { loading: this.state.loading }),
       _react2.default.createElement(
         'div',
         { id: 'main-container' },
@@ -300,6 +299,48 @@ exports.default = _react2.default.createClass({
     close: _react2.default.PropTypes.func.isRequired,
     highlight: _react2.default.PropTypes.object
   },
+
+  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
+    if (nextProps.highlight) {
+
+      if (nextProps.highlight.type == "location" && nextProps.highlight != this.props.highlight) {
+        this.shouldRenderSV = true;
+      } else if (!nextProps.highlight.type !== "location") {
+        this.panorama = null;
+      }
+    }
+  },
+  componentDidUpdate: function componentDidUpdate() {
+    if (this.shouldRenderSV) {
+      this.shouldRenderSV = false;
+      this.panorama = new google.maps.StreetViewPanorama(document.getElementById('street-view'), {
+        position: { lat: this.props.highlight.data.lat, lng: this.props.highlight.data.lng },
+        pov: { heading: 165, pitch: 0 },
+        zoom: 1
+      });
+    }
+  },
+
+
+  //Sub render method to render location's street view
+  //@param props (ojbect) data about the location
+  renderLocation: function renderLocation(props) {
+    return _react2.default.createElement(
+      'div',
+      { className: 'details-bar-content' },
+      _react2.default.createElement('div', { id: 'street-view' }),
+      _react2.default.createElement(
+        'div',
+        { className: 'details-bar-sidebar' },
+        _react2.default.createElement(
+          'p',
+          { className: 'title' },
+          props.name
+        )
+      )
+    );
+  },
+
 
   //Sub render method to render movies information
   //@param props (ojbect) data about the movie
@@ -415,7 +456,7 @@ exports.default = _react2.default.createClass({
       { id: 'details-bar', className: this.props.highlight ? "visible " + this.props.highlight.type : "" },
       _react2.default.createElement('a', { className: 'details-bar-close icon icon-cross', onClick: this.props.close }),
       function () {
-        if (_this.props.highlight) return _this.props.highlight == "location" ? _this.renderLocation(_this.props) : _this.renderMovie(_this.props.highlight.data);
+        if (_this.props.highlight) return _this.props.highlight.type == "location" ? _this.renderLocation(_this.props.highlight.data) : _this.renderMovie(_this.props.highlight.data);
       }()
     );
   }
@@ -541,9 +582,7 @@ exports.default = _react2.default.createClass({
 
     //Easiest way to listen to clicks on Leaflet popups
     document.getElementById('map').addEventListener('click', function (event) {
-      console.log('click happen');
       if ((0, _helpers.closest)(event.target, '.location-popup')) {
-        console.log('clfirst closets');
         _this.handleLocationPopupClick(event);
       }
     }, true);
@@ -553,7 +592,8 @@ exports.default = _react2.default.createClass({
   //empty locations
   getInitialState: function getInitialState() {
     return {
-      mapLocations: []
+      mapLocations: [],
+      districts: []
     };
   },
 
@@ -722,6 +762,10 @@ var _SidebarActions = require('../actions/SidebarActions.js');
 
 var _SidebarActions2 = _interopRequireDefault(_SidebarActions);
 
+var _MapActions = require('../actions/MapActions.js');
+
+var _MapActions2 = _interopRequireDefault(_MapActions);
+
 var _SidebarStore = require('../stores/SidebarStore.js');
 
 var _SidebarStore2 = _interopRequireDefault(_SidebarStore);
@@ -729,10 +773,6 @@ var _SidebarStore2 = _interopRequireDefault(_SidebarStore);
 var _Constants = require('../constants/Constants');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* Contains all the sidebar childs
-and interacts with the sidebar Actions.
-Receive filters from app */
 
 exports.default = _react2.default.createClass({
   displayName: 'Sidebar',
@@ -799,10 +839,20 @@ exports.default = _react2.default.createClass({
   },
 
 
+  //Clicks on the "open highlight" or see more button
+  //@parma type [location|movie]
+  //@parm id (number)
+  //@param data (object)
+  handleViewMoreClick: function handleViewMoreClick(type, id, data) {
+    console.log(arguments);
+    _MapActions2.default.openHighlight(type, id, data);
+  },
+
+
   render: function render() {
     return _react2.default.createElement(
       'div',
-      { id: 'sidebar', className: this.state.loading ? "loading" + this.state.loading : "" },
+      { id: 'sidebar', className: this.state.loading ? "loading-" + this.state.loading : "" },
       _react2.default.createElement(_SearchBox2.default, {
         type: this.state.type,
         changeType: this.changeType,
@@ -818,14 +868,22 @@ exports.default = _react2.default.createClass({
         requestItems: this.requestItems,
         loading: this.state.loading,
         selectFilter: this.selectFilter,
-        filters: this.props.filters
-      })
+        filters: this.props.filters,
+        handleViewMoreClick: this.handleViewMoreClick
+      }),
+      _react2.default.createElement(
+        'span',
+        { className: 'loading' },
+        _react2.default.createElement('img', { src: '/static/images/facebook2.gif' })
+      )
     );
   }
 
-});
+}); /* Contains all the sidebar childs
+    and interacts with the sidebar Actions.
+    Receive filters from app */
 
-},{"../actions/SidebarActions.js":2,"../constants/Constants":22,"../stores/SidebarStore.js":25,"./sidebar/SearchBox":19,"./sidebar/SidebarList":21,"react":554}],8:[function(require,module,exports){
+},{"../actions/MapActions.js":1,"../actions/SidebarActions.js":2,"../constants/Constants":22,"../stores/SidebarStore.js":25,"./sidebar/SearchBox":19,"./sidebar/SidebarList":21,"react":554}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1184,11 +1242,19 @@ exports.default = _react2.default.createClass({
       'div',
       { className: 'map-popup' },
       function () {
-        if (_this.props.showPic) return _react2.default.createElement(_GoogleSVPoster2.default, {
-          lat: _this.props.lat,
-          lng: _this.props.lng,
-          width: 150,
-          height: 90 });
+        if (_this.props.showPic) return _react2.default.createElement(
+          'a',
+          { className: 'trigger',
+            'data-highlight': 'location',
+            'data-id': _this.props.id,
+            'data-data': (0, _stringify2.default)(_this.props) },
+          _react2.default.createElement(_GoogleSVPoster2.default, {
+            lat: _this.props.lat,
+            lng: _this.props.lng,
+            width: 150,
+            height: 90
+          })
+        );
       }(),
       _react2.default.createElement(
         'p',
@@ -1355,9 +1421,9 @@ exports.default = _react2.default.createClass({
       function () {
         switch (_this.props.type) {
           case "movies":
-            return _react2.default.createElement(_MovieListItem2.default, { item: item });break;
+            return _react2.default.createElement(_MovieListItem2.default, { item: item, handleViewMoreClick: _this.props.handleViewMoreClick });break;
           default:
-            return _react2.default.createElement(_PlainListItem2.default, { item: item });break;
+            return _react2.default.createElement(_PlainListItem2.default, { item: item, handleViewMoreClick: _this.props.handleViewMoreClick });break;
         }
       }()
     );
@@ -1394,6 +1460,12 @@ exports.default = _react2.default.createClass({
     item: _react2.default.PropTypes.object
   },
 
+  handleClick: function handleClick(e) {
+    e.stopPropagation();
+    this.props.handleViewMoreClick("movie", this.props.item.id, this.props.item);
+  },
+
+
   render: function render() {
     //cache props
     var item = this.props.item;
@@ -1407,6 +1479,7 @@ exports.default = _react2.default.createClass({
       'div',
       { className: 'list-item-content movies' },
       _react2.default.createElement(_ImdbPoster2.default, { poster: item.poster, size: 40 }),
+      _react2.default.createElement('a', { className: 'icon-eye-plus', onClick: this.handleClick, title: 'View more' }),
       _react2.default.createElement(
         'p',
         { className: 'name' },
@@ -1452,13 +1525,23 @@ exports.default = _react2.default.createClass({
     item: _react2.default.PropTypes.object
   },
 
+  //click on "view more button"
+  handleClick: function handleClick(e) {
+    e.stopPropagation();
+    this.props.handleViewMoreClick("location", this.props.item.id, this.props.item);
+  },
+
+
   render: function render() {
+
+    var button = this.props.item.lat ? _react2.default.createElement("a", { className: "icon-eye-plus", onClick: this.handleClick, title: "View more" }) : null;
 
     var item = this.props.item;
 
     return _react2.default.createElement(
       "div",
       { className: "list-item-content plain" },
+      button,
       _react2.default.createElement(
         "p",
         { className: "name" },
@@ -1692,7 +1775,8 @@ exports.default = _react2.default.createClass({
         type: _this.props.type,
         item: item,
         selectFilter: _this.props.selectFilter,
-        selected: selectedId == item.id });
+        selected: selectedId == item.id,
+        handleViewMoreClick: _this.props.handleViewMoreClick });
     });
 
     return _react2.default.createElement(
@@ -1742,7 +1826,7 @@ var actions = exports.actions = (_actions = {
 	changeItemsType: 'changeItemsType',
 	removeFilter: 'removeFilter',
 	addFilter: 'addFilter'
-}, (0, _defineProperty3.default)(_actions, "removeFilter", 'removeFilter'), (0, _defineProperty3.default)(_actions, "openHighlight", 'openHighlight'), (0, _defineProperty3.default)(_actions, "closeHighlight", 'closeHighlight'), (0, _defineProperty3.default)(_actions, "moviesLoaded", 'moviesLoaded'), (0, _defineProperty3.default)(_actions, "locationsLoaded", 'locationsLoaded'), (0, _defineProperty3.default)(_actions, "districtsLoaded", 'districtsLoaded'), (0, _defineProperty3.default)(_actions, "setSidebarItems", 'setSidebarItems'), (0, _defineProperty3.default)(_actions, "addSidebarItems", 'addSidebarItems'), (0, _defineProperty3.default)(_actions, "sidebarStateChange", 'sidebarStateChange'), (0, _defineProperty3.default)(_actions, "sidebarItemsWillBeSet", 'sidebarItemsWillBeSet'), (0, _defineProperty3.default)(_actions, "sidebarItemsWillBeAdded", 'sidebarItemsWillBeAdded'), (0, _defineProperty3.default)(_actions, "locationDetailsLoaded", 'locationDetailsLoaded'), _actions);
+}, (0, _defineProperty3.default)(_actions, "removeFilter", 'removeFilter'), (0, _defineProperty3.default)(_actions, "openHighlight", 'openHighlight'), (0, _defineProperty3.default)(_actions, "closeHighlight", 'closeHighlight'), (0, _defineProperty3.default)(_actions, "moviesLoaded", 'moviesLoaded'), (0, _defineProperty3.default)(_actions, "locationsLoaded", 'locationsLoaded'), (0, _defineProperty3.default)(_actions, "districtsLoaded", 'districtsLoaded'), (0, _defineProperty3.default)(_actions, "setSidebarItems", 'setSidebarItems'), (0, _defineProperty3.default)(_actions, "addSidebarItems", 'addSidebarItems'), (0, _defineProperty3.default)(_actions, "sidebarStateChange", 'sidebarStateChange'), (0, _defineProperty3.default)(_actions, "sidebarItemsWillBeSet", 'sidebarItemsWillBeSet'), (0, _defineProperty3.default)(_actions, "sidebarItemsWillBeAdded", 'sidebarItemsWillBeAdded'), (0, _defineProperty3.default)(_actions, "locationDetailsLoaded", 'locationDetailsLoaded'), (0, _defineProperty3.default)(_actions, "locationsWillBeLoaded", 'locationsWillBeLoaded'), _actions);
 
 var events = exports.events = {
 	change: 'change'
@@ -1830,11 +1914,13 @@ var MapStore = (0, _assign2.default)({}, _events.EventEmitter.prototype, functio
 	//new locations loaded
 	.on(_Constants.actions.locationsLoaded, function (response) {
 		_state.mapLocations = response.items;
+		_state.loading = false;
 		MapStore.emitChange();
 	})
 	//districs have been loaded
 	//this will happen only on startup as we'll cache that information
 	.on(_Constants.actions.districtsLoaded, function (response) {
+		_state.loading = false;
 		_state.districts = response.items;
 		MapStore.emitChange();
 	})

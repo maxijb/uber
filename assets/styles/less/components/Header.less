@@ -8,6 +8,19 @@ header {
 	z-index: 31;
 	position: relative;
 
+	.loading-img {
+		display: none;
+	    position: relative;
+	    top: 4px;
+	    left: 9px;
+	}
+
+	&.loading {
+		.loading-img {
+			display: inline-block;
+		}
+	}
+
 	.header-buttons {
 		float: right; 
 		font-size: 0.8em;
@@ -59,6 +72,12 @@ header {
 		span {
 			font-weight: normal;
 			margin-left: 5px;
+		}
+
+		.loading {
+			left: 13px;
+		    position: relative;
+		    top: 4px;
 		}
 	}
 }

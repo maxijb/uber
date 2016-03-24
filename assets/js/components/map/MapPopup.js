@@ -33,11 +33,20 @@ export default React.createClass({
     		
     		{(() => { 
     			if (this.props.showPic) 
-    				return <GoogleSVPoster 
-    					lat={this.props.lat} 
-    					lng={this.props.lng} 
-    					width={150} 
-    					height={90} />
+    				return (
+    					<a className="trigger" 
+    						data-highlight="location" 
+    						data-id={this.props.id} 
+    						data-data={JSON.stringify(this.props)}>
+
+	    					<GoogleSVPoster 
+	    					lat={this.props.lat} 
+	    					lng={this.props.lng} 
+	    					width={150} 
+	    					height={90} 
+	    					/>
+    					</a>
+    				)
     		})() }
     		
     		<p className="name">{this.props.name}</p>

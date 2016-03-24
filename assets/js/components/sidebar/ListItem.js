@@ -29,8 +29,8 @@ export default React.createClass({
     		
         {(() => {
           switch (this.props.type) {
-            case "movies":   return ( <MovieListItem item={item} /> ); break;
-            default:         return ( <PlainListItem item={item} /> ); break;
+            case "movies":   return ( <MovieListItem item={item} handleViewMoreClick={this.props.handleViewMoreClick} /> ); break;
+            default:         return ( <PlainListItem item={item} handleViewMoreClick={this.props.handleViewMoreClick} /> ); break;
           }
         })()}
 

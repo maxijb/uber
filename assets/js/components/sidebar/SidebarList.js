@@ -47,7 +47,8 @@ export default React.createClass({
                     type={this.props.type} 
                     item={item} 
                     selectFilter={this.props.selectFilter} 
-                    selected={selectedId == item.id} /> 
+                    selected={selectedId == item.id} 
+                    handleViewMoreClick={this.props.handleViewMoreClick} /> 
         )
   	});
 

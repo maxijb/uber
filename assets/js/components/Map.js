@@ -49,7 +49,8 @@ export default React.createClass({
   //empty locations
   getInitialState() {
     return {
-      mapLocations: []
+      mapLocations: [],
+      districts: []
     }
   },
 

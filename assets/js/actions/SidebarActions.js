@@ -19,14 +19,14 @@ var SidebarActions = (function() {
     
     pubsub.emit(setNewItems ? actions.sidebarItemsWillBeSet : actions.sidebarItemsWillBeAdded);
 
-    fetch(urls[type] + queryString(options))
-    .then((response) => {
-       return response.json()
-    })
-    .then(data => {
-      let event = setNewItems ? actions.setSidebarItems : actions.addSidebarItems;
-      pubsub.emit(event, data);
-    });
+      fetch(urls[type] + queryString(options))
+      .then((response) => {
+         return response.json()
+      })
+      .then(data => {
+        let event = setNewItems ? actions.setSidebarItems : actions.addSidebarItems;
+        pubsub.emit(event, data);
+      });
 
   }
 

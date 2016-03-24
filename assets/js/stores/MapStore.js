@@ -30,11 +30,13 @@ const MapStore = Object.assign({}, EventEmitter.prototype, (() => {
 		//new locations loaded
 		.on(actions.locationsLoaded, (response) => {
 			_state.mapLocations = response.items;
+			_state.loading = false;
 			MapStore.emitChange();
 		})
 		//districs have been loaded
 		//this will happen only on startup as we'll cache that information
 		.on(actions.districtsLoaded, (response) => {
+			_state.loading = false;
 			_state.districts = response.items;
 			MapStore.emitChange();
 		})
@@ -67,7 +69,7 @@ const MapStore = Object.assign({}, EventEmitter.prototype, (() => {
 			_state.highlight = null;
 			MapStore.emitChange();
 		});
-	
+
 
 	//Helper to check if any filter has been applied
 	const checkAnyFiltersApplied = () => {

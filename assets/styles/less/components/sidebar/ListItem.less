@@ -8,6 +8,16 @@
     margin: 2px 0px;
     cursor: pointer;
 
+    .icon-eye-plus {
+        float: right;
+        color: @accent;
+        margin-top: 2px;
+        cursor: pointer;
+        &:hover {
+            color: @secondary;
+        }
+    }
+
     .year {
         font-size: 0.8em;
     }
@@ -34,6 +44,13 @@
         }
         .name {
             color: white;
+        }
+
+        .icon-eye-plus {
+            color: white;
+            &:hover {
+                color: @accent;
+            }
         }
     }
 

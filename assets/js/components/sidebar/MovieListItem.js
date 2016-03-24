@@ -9,6 +9,11 @@ export default React.createClass({
     item: React.PropTypes.object
   },
 
+  handleClick(e) {
+    e.stopPropagation();
+    this.props.handleViewMoreClick("movie", this.props.item.id, this.props.item);
+  },
+
   render: function() {
   	//cache props
     const item = this.props.item;
@@ -20,16 +25,20 @@ export default React.createClass({
                       }) 
                       : null;
 
+ 
+
     return (
     	<div className="list-item-content movies">
     		
         <ImdbPoster poster={item.poster} size={40} />
-    		
+        <a className="icon-eye-plus" onClick={this.handleClick} title="View more"></a>
+        
         <p className="name">{item.name}</p>
         
         {(() => item.release_year && ( <span className='year'>{item.release_year}</span> ) )()}
-    		
+        
         {(() => rating && ( <span className='rating'>{rating}</span> ) )()}
+
 
       </div>
     );
