@@ -540,7 +540,7 @@ exports.default = _react2.default.createClass({
     this.map.setView([_Constants.googleResponseDefaultSF.lat, _Constants.googleResponseDefaultSF.lng], _Constants.googleResponseDefaultSF.zoom).on('zoomend', this.updateMarkers).on('moveend', this.handleMoveMap);
 
     //Easiest way to listen to clicks on Leaflet popups
-    document.addEventListener('click', function (event) {
+    document.getElementById('map').addEventListener('click', function (event) {
       console.log('click happen');
       if ((0, _helpers.closest)(event.target, '.location-popup')) {
         console.log('clfirst closets');
@@ -632,8 +632,11 @@ exports.default = _react2.default.createClass({
     //find the trigger
     var trigger = (0, _helpers.closest)(event.target, ".trigger");
     //and trigger an action if required
-    if (trigger && trigger.dataset) {
-      _MapActions2.default.openHighlight(trigger.dataset.highlight, trigger.dataset.id, JSON.parse(trigger.dataset.data));
+    if (trigger) {
+      var highlight = trigger.getAttribute("data-highlight");
+      var id = trigger.getAttribute("data-id");
+      var data = trigger.getAttribute("data-data");
+      _MapActions2.default.openHighlight(highlight, id, JSON.parse(data));
     }
   },
 

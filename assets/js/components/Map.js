@@ -39,10 +39,8 @@ export default React.createClass({
         .on('moveend', this.handleMoveMap);
 
       //Easiest way to listen to clicks on Leaflet popups
-      document.addEventListener('click', (event) => {
-         console.log('click happen');
+      document.getElementById('map').addEventListener('click', (event) => {
          if (closest(event.target, '.location-popup')) {
-          console.log('clfirst closets');
            this.handleLocationPopupClick(event);
          }
       }, true);
@@ -128,8 +126,11 @@ export default React.createClass({
     //find the trigger
     const trigger = closest(event.target, ".trigger");
     //and trigger an action if required
-    if (trigger && trigger.dataset) {
-      MapActions.openHighlight(trigger.dataset.highlight, trigger.dataset.id, JSON.parse(trigger.dataset.data));
+    if (trigger) {
+      const highlight = trigger.getAttribute("data-highlight");
+      const id = trigger.getAttribute("data-id");
+      const data = trigger.getAttribute("data-data");
+      MapActions.openHighlight(highlight, id, JSON.parse(data));
     }
   },
 
