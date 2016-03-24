@@ -4,19 +4,19 @@
   on the '#react-root' div
 */
 
-import {default as React} from 'react';
-import {default as ReactDOM} from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 import {events, actions} from '../constants/Constants';
 
-import {default as MapActions} from '../actions/MapActions';
-import {default as MapStore} from '../stores/MapStore';
+import MapActions from '../actions/MapActions';
+import MapStore from '../stores/MapStore';
 
-import {default as Header} from './Header';
-import {default as Sidebar} from './Sidebar';
-import {default as Map} from './Map';
-import {default as DetailsBar} from './DetailsBar';
-import {default as StatusBar} from './StatusBar';
+import Header from './Header';
+import Sidebar from './Sidebar';
+import Map from'./Map';
+import DetailsBar from './DetailsBar';
+import StatusBar from './StatusBar';
 
 
 let App = React.createClass({

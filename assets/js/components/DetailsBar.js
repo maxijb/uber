@@ -1,11 +1,20 @@
-import {default as React} from 'react';
-import {default as ImdbPoster} from './helpers/ImdbPoster';
+/* Details bar at the bottom
+to show the complete information for a movie or Street View
+*/
+
+import React from 'react';
+import ImdbPoster from './helpers/ImdbPoster';
 
 export default React.createClass({
 
-  renderMovie(props) {
+	propTypes: {
+		close: React.PropTypes.func.isRequired,
+		highlight: React.PropTypes.object
+	},
 
-  	console.log(this.props);
+  //Sub render method to render movies information
+  //@param props (ojbect) data about the movie
+  renderMovie(props) {
 
   	const rating = props && !isNaN(props.imdbRating) ? 
                       Array.apply(null, Array(Math.round(props.imdbRating/2))).map((x,i) => { 

@@ -1,4 +1,8 @@
-import {default as pubsub} from '../dispatcher/Dispatcher';
+/* Store containig information regarding the map.
+   Listens to pubsub and emits a 'change' event
+   */
+
+import pubsub from '../dispatcher/Dispatcher';
 import {events, actions} from '../constants/Constants';
 import {EventEmitter} from 'events';
 
@@ -20,24 +24,32 @@ const MapStore = Object.assign({}, EventEmitter.prototype, (() => {
 		highlight: null
 	};
 
+
+	//Listen to this actions:
 	pubsub
+		//new locations loaded
 		.on(actions.locationsLoaded, (response) => {
 			_state.mapLocations = response.items;
 			MapStore.emitChange();
 		})
+		//districs have been loaded
+		//this will happen only on startup as we'll cache that information
 		.on(actions.districtsLoaded, (response) => {
 			_state.districts = response.items;
 			MapStore.emitChange();
 		})
+		//location details havebeen loaded
 		.on(actions.locationDetailsLoaded, (response) => {
 			_state.lastDetails = response.details;
 			MapStore.emitChange();
 		})
+		//a new filter has been selected
 		.on(actions.addFilter, (filter) => {
 			_state.filters = Object.assign({}, _state.filters, filter);
 			_state.anyFiltersApplied = true;
 			MapStore.emitChange();
 		})
+		//filter unselected. Chack if any remains
 		.on(actions.removeFilter, (filter) => {
 			let message = {};
 			message[filter] = null;
@@ -45,16 +57,19 @@ const MapStore = Object.assign({}, EventEmitter.prototype, (() => {
 			checkAnyFiltersApplied();
 			MapStore.emitChange();
 		})
+		//opent the highlight bar
 		.on(actions.openHighlight, (highlight) => {
 			_state.highlight = highlight;
 			MapStore.emitChange();
 		})
+		//close the highlight bar
 		.on(actions.closeHighlight, () => {
 			_state.highlight = null;
 			MapStore.emitChange();
 		});
 	
 
+	//Helper to check if any filter has been applied
 	const checkAnyFiltersApplied = () => {
 		let applied = false;
 			for (let i in _state.filters) {
@@ -68,6 +83,7 @@ const MapStore = Object.assign({}, EventEmitter.prototype, (() => {
 	}
 
 
+	//Public API
 	return {
 		getState() { return _state } ,
 		//Emit the change event for the views

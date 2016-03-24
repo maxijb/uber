@@ -1,3 +1,5 @@
+/* ----------- Apis Configuration --------------------- */
+
 export const mapboxApiKey 			 = "pk.eyJ1IjoibWJlbmVkZXR0byIsImEiOiJnUWxUS0MwIn0.SiA0N-P9Bdn_KltM8D_V_w";
 export const googleApiKey			 = 'AIzaSyCwet2EyOpO1Fz4wRu9tF3YGFS43zbQft4';
 export const googleResponseDefaultSF = {
@@ -10,6 +12,10 @@ export const googleResponseDefaultSF = {
 export const LeafletImagesPath = '/static/images/';
 export const LeafletMapTilesPath = 'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=';
 export const defaultImgPlaceholder = "/static/images/default-placeholder.png";
+
+
+
+/* ----------- Actions and events --------------------- */
 
 export const actions = {
 	appLoad: 'appLoad',
@@ -37,6 +43,10 @@ export const actions = {
 export const events = {
 	change: 'change'
 }
+
+
+
+/* ----------- App routes --------------------- */
 
 export const urls = {
 	locations	: '/api/locations',

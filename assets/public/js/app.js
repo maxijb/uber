@@ -277,11 +277,22 @@ var _ImdbPoster2 = _interopRequireDefault(_ImdbPoster);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/* Details bar at the bottom
+to show the complete information for a movie or Street View
+*/
+
 exports.default = _react2.default.createClass({
   displayName: 'DetailsBar',
-  renderMovie: function renderMovie(props) {
 
-    console.log(this.props);
+
+  propTypes: {
+    close: _react2.default.PropTypes.func.isRequired,
+    highlight: _react2.default.PropTypes.object
+  },
+
+  //Sub render method to render movies information
+  //@param props (ojbect) data about the movie
+  renderMovie: function renderMovie(props) {
 
     var rating = props && !isNaN(props.imdbRating) ? Array.apply(null, Array(Math.round(props.imdbRating / 2))).map(function (x, i) {
       return _react2.default.createElement('span', { key: i, className: 'icon-star-full' });
@@ -462,7 +473,7 @@ exports.default = _react2.default.createClass({
         );
     }
 
-});
+}); /* Renders ths static header of the page */
 
 },{"react":187}],6:[function(require,module,exports){
 'use strict';
@@ -492,7 +503,9 @@ var _helpers = require('./helpers/helpers');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 //import Leaflet only on the browser
-var L = typeof window !== "undefined" ? L = require('leaflet') : null;
+var L = typeof window !== "undefined" ? L = require('leaflet') : null; /* Static conatiner and behaviour for the map actions.
+                                                                       All the dom interactions within the map are handled by leaflet, not react.
+                                                                       */
 
 exports.default = _react2.default.createClass({
   displayName: 'Map',
@@ -502,33 +515,37 @@ exports.default = _react2.default.createClass({
     //Listen to the store
     _MapStore2.default.on(_Constants.events.change, this.handleMapStateChange);
 
-    //Init the map
-    this.map = L.map('map');
-    L.Icon.Default.imagePath = _Constants.LeafletImagesPath;
-    L.tileLayer(_Constants.LeafletMapTilesPath + _Constants.mapboxApiKey).addTo(this.map);
-    this.map.setView([_Constants.googleResponseDefaultSF.lat, _Constants.googleResponseDefaultSF.lng], _Constants.googleResponseDefaultSF.zoom);
-
     //This component owns markers data
     this.markers = {};
     this.markerLayer = null;
+    this.renderedLocations = [];
+    this.type = null;
 
-    this.map.on('zoomend', this.updateMarkers);
-    this.map.on('moveend', this.handleMoveMap);
+    //Init the map
+    this.map = L.map('map');
 
-    //Leaflet doesn't listen to clicks on popups
+    L.tileLayer(_Constants.LeafletMapTilesPath + _Constants.mapboxApiKey).addTo(this.map);
+
+    this.map.setView([_Constants.googleResponseDefaultSF.lat, _Constants.googleResponseDefaultSF.lng], _Constants.googleResponseDefaultSF.zoom).on('zoomend', this.updateMarkers).on('moveend', this.handleMoveMap);
+
+    //Easiest way to listen to clicks on Leaflet popups
     document.getElementById('map').addEventListener('click', function (event) {
       if ((0, _helpers.closest)(event.target, '.location-popup')) {
         _this.handleLocationPopupClick(event);
       }
     });
   },
+
+
+  //empty locations
   getInitialState: function getInitialState() {
     return {
-      mapLocations: [],
-      renderedLocations: [],
-      type: null
+      mapLocations: []
     };
   },
+
+
+  //When the mapStore changes, check if we need to update our markers and settings
   handleMapStateChange: function handleMapStateChange(mapState) {
     this.setState(mapState);
     this.updateMarkers();
@@ -541,11 +558,18 @@ exports.default = _react2.default.createClass({
     return false;
   },
 
+  //Get new markers as user moves the map
+  //if no filters have been applied and the zoom is greater than 14
+  //otherwise it will show distrcts
   handleMoveMap: function handleMoveMap() {
     if (this.map.getZoom() >= 14 && !this.state.anyFiltersApplied) {
       _MapActions2.default.requestLocations({ coordinates: this.map.getBounds().toBBoxString() });
     }
   },
+
+
+  //when we click on a marker we want more information about it
+  //check if the marker still exists before assigning the new prperties
   updateOpenMarkerPopup: function updateOpenMarkerPopup(details) {
     //Find the marker to update
     var marker = details ? this.markers[details.id] : null;
@@ -567,37 +591,55 @@ exports.default = _react2.default.createClass({
     if (!this.state.anyFiltersApplied && (!this.state.mapLocations.length || this.state.mapLocations.length >= 100 && this.map.getZoom() < 14)) {
 
       // We only need to update if we weren't showing ditricts
-      if (this.state.type !== "district") {
-        this.setState({ renderedLocations: this.state.districts, type: "district" });
+      if (this.type !== "district") {
+        this.renderedLocations = this.state.districts;
+        this.type = "district";
         this.renderMarkers(this.state.districts, this.handleDistrictClick);
       }
     } else {
       //if we need to render locations' markers
       //we need to check that the lists are different
-      if (this.state.mapLocations !== this.state.renderedLocations) {
-        this.setState({ renderedLocations: this.state.mapLocations, type: "location" });
+      if (this.state.mapLocations !== this.renderedLocations) {
+        this.renderedLocations = this.state.mapLocations;
+        this.type = "location";
         this.renderMarkers(this.state.mapLocations, this.handleLocationClick);
       }
     }
   },
+
+
+  //Clicks on distruct triggers an action
   handleDistrictClick: function handleDistrictClick(district, marker, event) {
     _MapActions2.default.selectDistrict({ id: district.id, name: district.name });
   },
+
+
+  //Clicks on popups
   handleLocationPopupClick: function handleLocationPopupClick(event) {
+    //find the trigger
     var trigger = (0, _helpers.closest)(event.target, ".trigger");
+    //and trigger an action if required
     if (trigger && trigger.dataset) {
       _MapActions2.default.openHighlight(trigger.dataset.highlight, trigger.dataset.id, JSON.parse(trigger.dataset.data));
     }
   },
+
+
+  //CLicks on locations markers
   handleLocationClick: function handleLocationClick(location, marker, event) {
+    //the click will by default try to close the popup
     marker.openPopup();
 
     //update marker popup if required
     if (!marker.fullyLoaded && marker.addPopupProperties) {
+      //start updating the popup and ask for more data
       marker.addPopupProperties({ showPic: true, loading: true });
       _MapActions2.default.requestLocationDetails(location.id);
     }
   },
+
+
+  //kill all markers and return a new group layer
   resetMarkers: function resetMarkers() {
     if (this.markerLayer) {
       this.map.removeLayer(this.markerLayer);
@@ -606,6 +648,9 @@ exports.default = _react2.default.createClass({
 
     return L.featureGroup([]).addTo(this.map);
   },
+
+
+  //just walk the desired points and call marker factory
   renderMarkers: function renderMarkers(pois, handleClick, handlePopupClick) {
     var _this2 = this;
 
@@ -614,10 +659,11 @@ exports.default = _react2.default.createClass({
     pois.forEach(function (loc) {
 
       if (loc && loc.lat) {
-        _this2.markers[loc.id] = (0, _MarkerFactory.MarkerFactory)(_this2.state.type, loc, handleClick).addTo(_this2.markerLayer);
+        _this2.markers[loc.id] = (0, _MarkerFactory.MarkerFactory)(_this2.type, loc, handleClick).addTo(_this2.markerLayer);
       }
     });
 
+    //if some filters are applied and we're not showing districts
     if (this.state.anyFiltersApplied && pois != this.state.districts) {
       //get bound of the markes
       var bounds = this.markerLayer.getBounds();
@@ -629,6 +675,8 @@ exports.default = _react2.default.createClass({
   },
 
 
+  //render a static container
+  //the updates are handled by leaflet
   render: function render() {
     return _react2.default.createElement('div', { id: 'map' });
   }
@@ -666,8 +714,19 @@ var _Constants = require('../constants/Constants');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/* Contains all the sidebar childs
+and interacts with the sidebar Actions.
+Receive filters from app */
+
 exports.default = _react2.default.createClass({
   displayName: 'Sidebar',
+
+
+  propTypes: {
+    filters: _react2.default.PropTypes.object
+  },
+
+  //bind the onchnage event from store
   componentDidMount: function componentDidMount() {
     _SidebarStore2.default.on(_Constants.events.change, this.handleStoreChange);
   },
@@ -678,19 +737,33 @@ exports.default = _react2.default.createClass({
       filterValue: ''
     };
   },
+
+
+  //update state according to store
   handleStoreChange: function handleStoreChange(storeState) {
     this.setState(storeState);
   },
+
+
+  //Change type of filter applied
+  //@param type (string) [directors|writers...]
   changeType: function changeType(type) {
     this.setState({ "type": type, filterValue: '' });
     _SidebarActions2.default.changeType(type);
   },
+
+
+  //request more items more the server on infinite scrolling
+  //send active filtering information
   requestItems: function requestItems() {
     _SidebarActions2.default.requestItems(false, this.state.type, {
       offset: this.state.listItems.length,
       name: this.state.filterValue
     });
   },
+
+
+  //when user types, filter results accordingly
   handleFilterChange: function handleFilterChange(value) {
     this.setState({ filterValue: value });
     //TODO Debounce
@@ -698,7 +771,12 @@ exports.default = _react2.default.createClass({
       name: value
     });
   },
+
+
+  //select an item will filter the locations on the map
+  //@param filter (object) {id, value} of the item clicked
   selectFilter: function selectFilter(filter) {
+    //we create a message including the type, and the filter as value
     var message = {};
     message[this.state.type] = filter;
     _SidebarActions2.default.selectFilter(message);
@@ -750,12 +828,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = _react2.default.createClass({
   displayName: 'StatusBar',
+
+
+  propTypes: {
+    filters: _react2.default.PropTypes.object
+  },
+
+  //not muting objects allows us to compare like this
   shouldComponentUpdate: function shouldComponentUpdate(nextProps, nextState) {
     return nextProps.filters !== this.props.filters;
   },
+
+
+  //if filter have changed request new map markers
   componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
     _MapActions2.default.requestLocations(nextProps.filters);
   },
+
+
+  //remove filter
   removeFilter: function removeFilter(filter) {
     _MapActions2.default.removeFilter(filter.type);
   },
@@ -1209,6 +1300,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = _react2.default.createClass({
   displayName: 'ListItem',
+
+
+  propTypes: {
+    selectFilter: _react2.default.PropTypes.func.isRequired,
+    item: _react2.default.PropTypes.object.isRequired,
+    selected: _react2.default.PropTypes.bool
+  },
+
   handleClick: function handleClick() {
     this.props.selectFilter(this.props.selected ? null : { id: this.props.item.id, name: this.props.item.name });
   },
@@ -1233,7 +1332,9 @@ exports.default = _react2.default.createClass({
     );
   }
 
-});
+}); /* Generic list Item.
+       Depending on the type of information we receive, 
+      we render a different sub-component. */
 
 },{"./MovieListItem":17,"./PlainListItem":18,"react":187}],17:[function(require,module,exports){
 'use strict';
@@ -1583,6 +1684,8 @@ var _actions;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+/* ----------- Apis Configuration --------------------- */
+
 var mapboxApiKey = exports.mapboxApiKey = "pk.eyJ1IjoibWJlbmVkZXR0byIsImEiOiJnUWxUS0MwIn0.SiA0N-P9Bdn_KltM8D_V_w";
 var googleApiKey = exports.googleApiKey = 'AIzaSyCwet2EyOpO1Fz4wRu9tF3YGFS43zbQft4';
 var googleResponseDefaultSF = exports.googleResponseDefaultSF = {
@@ -1596,6 +1699,8 @@ var LeafletImagesPath = exports.LeafletImagesPath = '/static/images/';
 var LeafletMapTilesPath = exports.LeafletMapTilesPath = 'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=';
 var defaultImgPlaceholder = exports.defaultImgPlaceholder = "/static/images/default-placeholder.png";
 
+/* ----------- Actions and events --------------------- */
+
 var actions = exports.actions = (_actions = {
 	appLoad: 'appLoad',
 	changeItemsType: 'changeItemsType',
@@ -1606,6 +1711,8 @@ var actions = exports.actions = (_actions = {
 var events = exports.events = {
 	change: 'change'
 };
+
+/* ----------- App routes --------------------- */
 
 var urls = exports.urls = {
 	locations: '/api/locations',
@@ -1623,11 +1730,18 @@ var urls = exports.urls = {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+/* We don't need waitFor() or all the overead introduced by the Flux dispatcher
+   We might very well get away with Node's default EventEmitter
+   to communicate actions with stores
+*/
+
 var EventEmitter = require('events').EventEmitter,
     pubsub = void 0;
 
 if (typeof window !== "undefined") {
 	//let's not override the global pubsub object with a new instance
+	//that woudl duplicate our event emiters and our components
+	//could end up listening to different objects
 	pubsub = window.pubsub || new EventEmitter();
 	window.pubsub = pubsub;
 } else {
@@ -1671,33 +1785,50 @@ var MapStore = Object.assign({}, _events.EventEmitter.prototype, function () {
 		highlight: null
 	};
 
-	_Dispatcher2.default.on(_Constants.actions.locationsLoaded, function (response) {
+	//Listen to this actions:
+	_Dispatcher2.default
+	//new locations loaded
+	.on(_Constants.actions.locationsLoaded, function (response) {
 		_state.mapLocations = response.items;
 		MapStore.emitChange();
-	}).on(_Constants.actions.districtsLoaded, function (response) {
+	})
+	//districs have been loaded
+	//this will happen only on startup as we'll cache that information
+	.on(_Constants.actions.districtsLoaded, function (response) {
 		_state.districts = response.items;
 		MapStore.emitChange();
-	}).on(_Constants.actions.locationDetailsLoaded, function (response) {
+	})
+	//location details havebeen loaded
+	.on(_Constants.actions.locationDetailsLoaded, function (response) {
 		_state.lastDetails = response.details;
 		MapStore.emitChange();
-	}).on(_Constants.actions.addFilter, function (filter) {
+	})
+	//a new filter has been selected
+	.on(_Constants.actions.addFilter, function (filter) {
 		_state.filters = Object.assign({}, _state.filters, filter);
 		_state.anyFiltersApplied = true;
 		MapStore.emitChange();
-	}).on(_Constants.actions.removeFilter, function (filter) {
+	})
+	//filter unselected. Chack if any remains
+	.on(_Constants.actions.removeFilter, function (filter) {
 		var message = {};
 		message[filter] = null;
 		_state.filters = Object.assign({}, _state.filters, message);
 		checkAnyFiltersApplied();
 		MapStore.emitChange();
-	}).on(_Constants.actions.openHighlight, function (highlight) {
+	})
+	//opent the highlight bar
+	.on(_Constants.actions.openHighlight, function (highlight) {
 		_state.highlight = highlight;
 		MapStore.emitChange();
-	}).on(_Constants.actions.closeHighlight, function () {
+	})
+	//close the highlight bar
+	.on(_Constants.actions.closeHighlight, function () {
 		_state.highlight = null;
 		MapStore.emitChange();
 	});
 
+	//Helper to check if any filter has been applied
 	var checkAnyFiltersApplied = function checkAnyFiltersApplied() {
 		var applied = false;
 		for (var i in _state.filters) {
@@ -1709,6 +1840,7 @@ var MapStore = Object.assign({}, _events.EventEmitter.prototype, function () {
 		_state.anyFiltersApplied = applied;
 	};
 
+	//Public API
 	return {
 		getState: function getState() {
 			return _state;
@@ -1719,7 +1851,9 @@ var MapStore = Object.assign({}, _events.EventEmitter.prototype, function () {
 			this.emit(_Constants.events.change, _state);
 		}
 	};
-}());
+}()); /* Store containig information regarding the map.
+         Listens to pubsub and emits a 'change' event
+         */
 
 exports.default = MapStore;
 
@@ -1750,21 +1884,29 @@ var SidebarStore = Object.assign({}, _events.EventEmitter.prototype, function ()
 	};
 
 	//Setting event Listeners, coming from actions
-	_Dispatcher2.default.on(_Constants.actions.addSidebarItems, function (response) {
+	_Dispatcher2.default
+	//add new items
+	.on(_Constants.actions.addSidebarItems, function (response) {
 		_state.complete = response.complete;
 		_state.listItems = _state.listItems.concat(response.items);
 		_state.loading = false;
 		SidebarStore.emitChange();
-	}).on(_Constants.actions.setSidebarItems, function (response) {
+	})
+	//replace the old items with these new
+	.on(_Constants.actions.setSidebarItems, function (response) {
 		_state.complete = response.complete;
 		_state.listItems = response.items;
 		_state.loading = false;
 		SidebarStore.emitChange();
-	}).on(_Constants.actions.sidebarItemsWillBeSet, function () {
+	})
+	//loding state
+	.on(_Constants.actions.sidebarItemsWillBeSet, function () {
 		_state.listItems = [];
 		_state.loading = "full";
 		SidebarStore.emitChange();
-	}).on(_Constants.actions.sidebarItemsWillBeAdded, function () {
+	})
+	//loding state on scroll
+	.on(_Constants.actions.sidebarItemsWillBeAdded, function () {
 		_state.loading = "partial";
 		SidebarStore.emitChange();
 	});
@@ -1783,7 +1925,7 @@ var SidebarStore = Object.assign({}, _events.EventEmitter.prototype, function ()
 			this.emit(_Constants.events.change, _state);
 		}
 	};
-}());
+}()); /* Store with information about the sidebar and its items */
 
 exports.default = SidebarStore;
 

@@ -1,3 +1,5 @@
+/* Renders ths static header of the page */
+
 import {default as React} from 'react';
 
 export default React.createClass({

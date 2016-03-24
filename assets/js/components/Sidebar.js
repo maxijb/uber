@@ -1,15 +1,22 @@
-import {default as React} from 'react';
-import {default as SearchBox} from './sidebar/SearchBox';
-import {default as SidebarList} from './sidebar/SidebarList';
+/* Contains all the sidebar childs
+and interacts with the sidebar Actions.
+Receive filters from app */
 
-import {default as SidebarActions} from '../actions/SidebarActions.js';
-import {default as SidebarStore} from '../stores/SidebarStore.js';
+import React from 'react';
+import SearchBox from './sidebar/SearchBox';
+import SidebarList from './sidebar/SidebarList';
+import SidebarActions from '../actions/SidebarActions.js';
+import SidebarStore from '../stores/SidebarStore.js';
 import {events} from '../constants/Constants';
 
 
 export default React.createClass({
   
+  propTypes: {
+    filters: React.PropTypes.object
+  },
 
+  //bind the onchnage event from store
   componentDidMount() {
     SidebarStore.on(events.change, this.handleStoreChange);
   },
@@ -23,15 +30,20 @@ export default React.createClass({
   	}
   },
 
+  //update state according to store
   handleStoreChange(storeState) {
   	this.setState(storeState);
   },
 
+  //Change type of filter applied
+  //@param type (string) [directors|writers...]
   changeType(type) {
   	this.setState({"type": type, filterValue: ''});
   	SidebarActions.changeType(type);
   },
 
+  //request more items more the server on infinite scrolling
+  //send active filtering information
   requestItems() {
   	SidebarActions.requestItems(false, this.state.type, {
   						offset: this.state.listItems.length, 
@@ -39,6 +51,7 @@ export default React.createClass({
   					});
   },
 
+  //when user types, filter results accordingly
   handleFilterChange(value) {
   	this.setState({filterValue: value});
   	//TODO Debounce
@@ -47,7 +60,10 @@ export default React.createClass({
   					});
   },
 
+  //select an item will filter the locations on the map
+  //@param filter (object) {id, value} of the item clicked
   selectFilter(filter) {
+    //we create a message including the type, and the filter as value
     let message = {};
     message[this.state.type] = filter;
     SidebarActions.selectFilter(message);

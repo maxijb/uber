@@ -1,15 +1,22 @@
-import {default as React} from 'react';
-import {default as MapActions} from '../actions/MapActions.js';
+import React from 'react';
+import MapActions from '../actions/MapActions.js';
 export default React.createClass({
 
+  propTypes: {
+    filters: React.PropTypes.object
+  },
+
+  //not muting objects allows us to compare like this
   shouldComponentUpdate(nextProps, nextState) {
   	return nextProps.filters !== this.props.filters;
   },
 
+  //if filter have changed request new map markers
   componentWillUpdate(nextProps, nextState) {
   	MapActions.requestLocations(nextProps.filters);
   },
 
+  //remove filter 
   removeFilter(filter) {
   	MapActions.removeFilter(filter.type)
   },
