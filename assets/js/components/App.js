@@ -4,6 +4,7 @@
   on the '#react-root' div
 */
 
+require("babel-polyfill");
 import React from 'react';
 import ReactDOM from 'react-dom';
 
