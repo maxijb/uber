@@ -39,7 +39,7 @@ export default React.createClass({
         .on('moveend', this.handleMoveMap);
 
       //Easiest way to listen to clicks on Leaflet popups
-      document.getElementById('map').addEventListener('click', (event) => {
+      document.addEventListener('click', (event) => {
          console.log('click happen');
          if (closest(event.target, '.location-popup')) {
           console.log('clfirst closets');
