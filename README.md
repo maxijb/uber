@@ -59,8 +59,8 @@ However, as one map library was needed, I included Leaflet, for it's ability to 
 The idea of the project was to provide the users with the possibility of filtering their favourites movies, and check where they've been filmed.
 That's why we allow to do filtering by name of the movie, actors, location and district. In order to find the item youre looking for you can start typing and the app will update your results. We only load batches of 30 results, and when the user scolls down, we load more...     
 
-Every interaction refreshes the marker on the map. If not filters have been applied and the zoom is not big enough, we render the marker for every district, rather than the individual locations markers. This way we can visualizae the areas fo the city were most movies have been filmed.
-If the user wants more information about a location or a movie, he can click either on the sidebar's items, or the locations popups, and will get a new section coming from the bottom of the page with a Street View block, or the details about the selected movie.
+Every interaction refreshes the marker on the map. If not filters have been applied and the zoom is not big enough, we render the marker for every district, rather than the individual locations markers. This way we can visualizae the areas fo the city were most movies have been filmed.   
+And every time the user clicks on something, he gets more detailed information about that element. For instance, if you click on a district marker, it will load locations belonging to that district. If later you click on a location's marker, its popup will be enriched with a picture and the movies filmed on it. And clicking either on the location picture, or on one of this movies, we get a semi-modal window, where we show more data about that particular item.
 
 
 **What could be improved**
