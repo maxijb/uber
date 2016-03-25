@@ -64,7 +64,7 @@ And every time the user clicks on something, he gets more detailed information a
 
 
 **What could be improved**
-- Sometimes Imdb is not very happy about me hotlinking their resources and they return 403s. It's ok guys, I know it's not personal :)  However, the app looks so much better when the images load... *Aparently it happens more often when you request the page by **http** protocol. So please, try to use **https**, as on the link provided below this file.*
+- Sometimes Imdb is not very happy about me hotlinking their resources and they return 403s. It's ok guys, I know it's not personal :)  However, the app looks so much better when the images load... *Aparently it happens more often when you request the page by **http** protocol. So please, try to use* **https**, *as on the link provided below this file.*
 - For the sake of simplicity, I printed English texts, where we usually would include variables that could be easily internationalized. 
 - The JS and CSS bundles are only one, when tipycally I would create one bundle for the app, and another for libraries  (which change less frequently). That way we could take more advantage of the browser's cache. 
 
